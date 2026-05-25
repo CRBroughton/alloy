@@ -1,4 +1,4 @@
-package tui
+package alloy
 
 import "core:fmt"
 import "core:strings"

@@ -13,7 +13,7 @@ LINKER_FLAGS := "-lGL -lm -lpthread -ldl -lrt -lX11"
 # Run tests for all packages
 test:
     -odin test src/style/
-    -odin test src/tui/
+    -odin test src/alloy/
 
 # Run a component example: just example text_input
 example name:

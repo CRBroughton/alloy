@@ -1,6 +1,6 @@
 package main
 
-import tui "../../../src/tui"
+import tui "../../../src/alloy"
 import "core:fmt"
 import "core:strings"
 

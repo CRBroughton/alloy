@@ -1,4 +1,4 @@
-package tui
+package alloy
 
 import style "../style"
 import "core:fmt"

@@ -4,16 +4,16 @@ A minimal TUI library for Odin, inspired by Bubble Tea.
 
 ## Install
 
-Copy `src/tui/` into your project's `vendor/` folder:
+Copy `src/alloy/` into your project's `vendor/` folder:
 
 ```sh
-cp -r src/tui/ your-project/vendor/tui/
+cp -r src/alloy/ your-project/vendor/alloy/
 ```
 
 Then import:
 
 ```odin
-import tui "vendor/tui"
+import alloy "vendor/alloy"
 ```
 
 ## Quick start

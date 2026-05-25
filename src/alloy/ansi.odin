@@ -1,4 +1,4 @@
-package tui
+package alloy
 
 CURSOR_HIDE   :: "\x1b[?25l"
 CURSOR_SHOW   :: "\x1b[?25h"

@@ -1,4 +1,4 @@
-package tui
+package alloy
 
 import "core:testing"
 import "core:time"

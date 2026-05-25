@@ -1,4 +1,4 @@
-package tui
+package alloy
 
 import "core:os"
 import "core:unicode/utf8"
