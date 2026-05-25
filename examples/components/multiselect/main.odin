@@ -28,10 +28,9 @@ update :: proc(m: ^Model, msg: tui.Msg) -> (^Model, tui.Cmd) {
 		return m, tui.quit
 	}
 
-	if result, ok := tui.multiselect_update(&m.sel, msg).(tui.MultiSelectDoneMsg); ok {
-		m.chosen = strings.join(result.labels, ", ")
-		delete(result.labels)
-		delete(result.values)
+	if _, ok := tui.multiselect_update(&m.sel, msg).(tui.MultiSelectDoneMsg); ok {
+		labels := tui.multiselect_selected_labels(&m.sel)
+		m.chosen = strings.join(labels, ", ")
 		m.sel.focused = false
 	}
 
