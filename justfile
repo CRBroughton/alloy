@@ -15,6 +15,10 @@ test:
     -odin test src/style/
     -odin test src/alloy/
 
+# Run counter example
+example-counter:
+    odin run examples/counter/ -extra-linker-flags:"{{LINKER_FLAGS}}"
+
 # Run a component example: just example text_input
 example name:
     odin run examples/components/{{name}}/ -extra-linker-flags:"{{LINKER_FLAGS}}"
