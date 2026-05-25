@@ -5,6 +5,7 @@
     "dependencies",
     "types",
     "program",
-    "style"
+    "style",
+    "tui"
   ]
 }
