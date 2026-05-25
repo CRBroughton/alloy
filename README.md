@@ -22,17 +22,17 @@ import alloy "vendor/alloy"
 package main
 
 import "core:fmt"
-import tui "vendor/tui"
+import alloy "vendor/alloy"
 
 Model :: struct { count: int }
 
-my_init :: proc() -> (^Model, tui.Cmd) {
+my_init :: proc() -> (^Model, alloy.Cmd) {
     return new(Model), nil
 }
 
-my_update :: proc(m: ^Model, msg: tui.Msg) -> (^Model, tui.Cmd) {
-    if km, ok := msg.(tui.KeyMsg); ok {
-        if km.key == .CtrlC                   do return m, tui.quit
+my_update :: proc(m: ^Model, msg: alloy.Msg) -> (^Model, alloy.Cmd) {
+    if km, ok := msg.(alloy.KeyMsg); ok {
+        if km.key == .CtrlC                   do return m, alloy.quit
         if km.key == .Rune && km.rune == '+' do m.count += 1
     }
     return m, nil
@@ -43,7 +43,7 @@ my_view :: proc(m: ^Model) -> string {
 }
 
 main :: proc() {
-    tui.run(&tui.Program(Model){
+    alloy.run(&alloy.Program(Model){
         init   = my_init,
         update = my_update,
         view   = my_view,
@@ -69,7 +69,7 @@ Use `SleepCmd` to schedule any delayed message — not just spinners:
 import "core:time"
 
 // Deliver a custom message after 2 seconds:
-return m, tui.SleepCmd{
+return m, alloy.SleepCmd{
     duration = 2 * time.Second,
     then     = MyTimeoutMsg{},
 }
