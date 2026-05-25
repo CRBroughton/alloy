@@ -15,6 +15,20 @@ test:
     -odin test src/style/
     -odin test src/alloy/
 
+# Build all examples into build/ (no execution; used in CI)
+build-all:
+    mkdir -p build
+    odin build examples/counter/                -out:build/counter        -extra-linker-flags:"{{LINKER_FLAGS}}"
+    odin build examples/components/text_input/  -out:build/text_input     -extra-linker-flags:"{{LINKER_FLAGS}}"
+    odin build examples/components/select/      -out:build/select         -extra-linker-flags:"{{LINKER_FLAGS}}"
+    odin build examples/components/spinner/     -out:build/spinner        -extra-linker-flags:"{{LINKER_FLAGS}}"
+    odin build examples/components/confirm/     -out:build/confirm        -extra-linker-flags:"{{LINKER_FLAGS}}"
+    odin build examples/components/multiselect/ -out:build/multiselect    -extra-linker-flags:"{{LINKER_FLAGS}}"
+
+# Remove build artifacts
+clean:
+    rm -rf build/
+
 # Run counter example
 example-counter:
     odin run examples/counter/ -extra-linker-flags:"{{LINKER_FLAGS}}"
