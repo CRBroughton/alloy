@@ -35,6 +35,10 @@ example-spinner:
 example-confirm:
     odin run examples/components/confirm/ -extra-linker-flags:"{{LINKER_FLAGS}}"
 
+# Run multiselect example
+example-multiselect:
+    odin run examples/components/multiselect/ -extra-linker-flags:"{{LINKER_FLAGS}}"
+
 # Show project info
 info:
     @echo "Odin Demo Project"

@@ -60,6 +60,7 @@ main :: proc() {
 - **Select**: keyboard-navigable option list; returns `SelectDoneMsg` on confirm
 - **Spinner**: animated indicator driven by a self-scheduling `SleepCmd` timer
 - **Confirm**: yes/no prompt with configurable default; returns `ConfirmMsg` on answer
+- **MultiSelect**: checkbox list; Space to toggle, Enter to confirm; returns `MultiSelectDoneMsg`
 
 ---
 
