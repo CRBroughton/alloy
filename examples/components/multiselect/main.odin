@@ -1,3 +1,4 @@
+
 package main
 
 import tui "../../../src/tui"
@@ -9,12 +10,12 @@ Model :: struct {
 	chosen: string,
 }
 
-options := []tui.SelectionOption{
-	{label = "Odin",   value = "odin"},
-	{label = "C",      value = "c"},
-	{label = "Go",     value = "go"},
-	{label = "Rust",   value = "rust"},
-	{label = "Zig",    value = "zig"},
+options := []tui.SelectionOption {
+	{label = "Odin", value = "odin"},
+	{label = "C", value = "c"},
+	{label = "Go", value = "go"},
+	{label = "Rust", value = "rust"},
+	{label = "Zig", value = "zig"},
 }
 
 init :: proc() -> (rawptr, tui.Cmd) {
