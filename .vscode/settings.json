@@ -3,6 +3,7 @@
   "editor.formatOnSave": true,
   "conventionalCommits.scopes": [
     "dependencies",
-    "ansi"
+    "ansi",
+    "types"
   ]
 }
