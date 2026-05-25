@@ -32,7 +32,7 @@ my_init :: proc() -> (^Model, alloy.Cmd) {
 
 my_update :: proc(m: ^Model, msg: alloy.Msg) -> (^Model, alloy.Cmd) {
     if km, ok := msg.(alloy.KeyMsg); ok {
-        if km.key == .CtrlC                   do return m, alloy.quit
+        if km.key == .CtrlC do return m, alloy.quit
         if km.key == .Rune && km.rune == '+' do m.count += 1
     }
     return m, nil
@@ -44,9 +44,9 @@ my_view :: proc(m: ^Model) -> string {
 
 main :: proc() {
     alloy.run(&alloy.Program(Model){
-        init   = my_init,
+        init = my_init,
         update = my_update,
-        view   = my_view,
+        view = my_view,
     })
 }
 ```
@@ -71,7 +71,7 @@ import "core:time"
 // Deliver a custom message after 2 seconds:
 return m, alloy.SleepCmd{
     duration = 2 * time.Second,
-    then     = MyTimeoutMsg{},
+    then = MyTimeoutMsg{},
 }
 ```
 
