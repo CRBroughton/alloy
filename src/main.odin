@@ -3,35 +3,37 @@ package main
 import tui "./tui"
 import "core:fmt"
 
+colours := []tui.SelectionOption {
+	{label = "Red", value = "red"},
+	{label = "Green", value = "green"},
+	{label = "Blue", value = "blue"},
+	{label = "Yellow", value = "yellow"},
+	{label = "Cyan", value = "cyan"},
+}
+
 AppModel :: struct {
-	input:     tui.TextInput,
-	submitted: string,
+	sel:    tui.Select,
+	chosen: string,
 }
 
 app_init :: proc() -> (rawptr, tui.Cmd) {
 	model := new(AppModel)
-	tui.text_input_init(&model.input)
-	model.input.placeholder = "Type something..."
-	model.input.prompt = "› "
+	tui.select_init(&model.sel, colours[:])
 	return model, nil
 }
 
 app_update :: proc(raw: rawptr, msg: tui.Msg) -> (rawptr, tui.Cmd) {
 	model := cast(^AppModel)raw
 
-	// Let the text input handle most keys
-	tui.text_input_update(&model.input, msg)
+	// Delegate to the component; handle any selection result directly
+	if done, ok := tui.select_update(&model.sel, msg).(tui.SelectDoneMsg); ok {
+		model.chosen = done.label
+	}
 
-	// Handle keys the parent cares about
-	if km, ok := msg.(tui.KeyMsg); ok {
-		#partial switch km.key {
-		case .Enter:
-			model.submitted = tui.text_input_value(model.input)
-			tui.text_input_set(&model.input, "")
-		case .CtrlC:
-			return raw, tui.quit
-		case:
-		}
+	switch m in msg {
+	case tui.KeyMsg:
+		if m.key == .CtrlC do return raw, tui.quit
+	case tui.SelectDoneMsg, tui.WindowSizeMsg, tui.QuitMsg:
 	}
 
 	return raw, nil
@@ -39,13 +41,13 @@ app_update :: proc(raw: rawptr, msg: tui.Msg) -> (rawptr, tui.Cmd) {
 
 app_view :: proc(raw: rawptr) -> string {
 	model := cast(^AppModel)raw
-	header := "Text Input Demo  (Enter to submit, Ctrl+C to quit)\r\n\r\n"
-	input := tui.text_input_view(model.input)
-	submitted := ""
-	if model.submitted != "" {
-		submitted = fmt.tprintf("\r\n\r\nLast submitted: %s", model.submitted)
+	header := "Choose a colour  (↑↓ navigate, Enter select, Ctrl+C quit)\r\n\r\n"
+	list := tui.select_view(model.sel)
+	footer := ""
+	if model.chosen != "" {
+		footer = fmt.tprintf("\r\nChosen: %s\r\n", model.chosen)
 	}
-	return fmt.tprintf("%s%s%s\r\n", header, input, submitted)
+	return fmt.tprintf("%s%s%s", header, list, footer)
 }
 
 main :: proc() {
