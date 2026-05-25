@@ -1,39 +1,39 @@
 package main
 
-import tui "./tui"
 import "core:fmt"
-
-colours := []tui.SelectionOption {
-	{label = "Red", value = "red"},
-	{label = "Green", value = "green"},
-	{label = "Blue", value = "blue"},
-	{label = "Yellow", value = "yellow"},
-	{label = "Cyan", value = "cyan"},
-}
+import tui "./tui"
 
 AppModel :: struct {
-	sel:    tui.Select,
-	chosen: string,
+	spinner: tui.Spinner,
+	done:    bool,
 }
 
 app_init :: proc() -> (rawptr, tui.Cmd) {
 	model := new(AppModel)
-	tui.select_init(&model.sel, colours[:])
-	return model, nil
+	tui.spinner_init(&model.spinner, id = 1)
+	model.spinner.label = "Working on something..."
+	cmd := tui.spinner_start(&model.spinner)
+	return model, cmd
 }
 
 app_update :: proc(raw: rawptr, msg: tui.Msg) -> (rawptr, tui.Cmd) {
 	model := cast(^AppModel)raw
 
-	// Delegate to the component; handle any selection result directly
-	if done, ok := tui.select_update(&model.sel, msg).(tui.SelectDoneMsg); ok {
-		model.chosen = done.label
+	// Route tick to spinner; returns the next SleepCmd while active
+	if cmd := tui.spinner_update(&model.spinner, msg); cmd != nil {
+		return raw, cmd
 	}
 
 	switch m in msg {
 	case tui.KeyMsg:
-		if m.key == .CtrlC do return raw, tui.quit
-	case tui.SelectDoneMsg, tui.WindowSizeMsg, tui.QuitMsg:
+		#partial switch m.key {
+		case .Enter:
+			tui.spinner_stop(&model.spinner)
+			model.done = true
+		case .CtrlC:
+			return raw, tui.quit
+		}
+	case tui.TickMsg, tui.SelectDoneMsg, tui.WindowSizeMsg, tui.QuitMsg:
 	}
 
 	return raw, nil
@@ -41,17 +41,17 @@ app_update :: proc(raw: rawptr, msg: tui.Msg) -> (rawptr, tui.Cmd) {
 
 app_view :: proc(raw: rawptr) -> string {
 	model := cast(^AppModel)raw
-	header := "Choose a colour  (↑↓ navigate, Enter select, Ctrl+C quit)\r\n\r\n"
-	list := tui.select_view(model.sel)
-	footer := ""
-	if model.chosen != "" {
-		footer = fmt.tprintf("\r\nChosen: %s\r\n", model.chosen)
+	if model.done {
+		return "Done!\r\n\r\nPress Ctrl+C to exit.\r\n"
 	}
-	return fmt.tprintf("%s%s%s", header, list, footer)
+	return fmt.tprintf(
+		"Spinner Demo\r\n\r\n%s\r\n\r\nPress Enter to finish, Ctrl+C to quit.\r\n",
+		tui.spinner_view(model.spinner),
+	)
 }
 
 main :: proc() {
-	p := tui.Program {
+	p := tui.Program{
 		init   = app_init,
 		update = app_update,
 		view   = app_view,
