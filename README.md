@@ -26,27 +26,24 @@ import tui "vendor/tui"
 
 Model :: struct { count: int }
 
-my_init :: proc() -> (rawptr, tui.Cmd) {
-    m := new(Model)
+my_init :: proc() -> (^Model, tui.Cmd) {
+    return new(Model), nil
+}
+
+my_update :: proc(m: ^Model, msg: tui.Msg) -> (^Model, tui.Cmd) {
+    if km, ok := msg.(tui.KeyMsg); ok {
+        if km.key == .CtrlC                   do return m, tui.quit
+        if km.key == .Rune && km.rune == '+' do m.count += 1
+    }
     return m, nil
 }
 
-my_update :: proc(raw: rawptr, msg: tui.Msg) -> (rawptr, tui.Cmd) {
-    m := cast(^Model)raw
-    if km, ok := msg.(tui.KeyMsg); ok {
-        if km.key == .CtrlC                        do return raw, tui.quit
-        if km.key == .Rune && km.rune == '+' do m.count += 1
-    }
-    return raw, nil
-}
-
-my_view :: proc(raw: rawptr) -> string {
-    m := cast(^Model)raw
+my_view :: proc(m: ^Model) -> string {
     return fmt.tprintf("Count: %d  (+ to increment, Ctrl+C to quit)\r\n", m.count)
 }
 
 main :: proc() {
-    tui.run(&tui.Program{
+    tui.run(&tui.Program(Model){
         init   = my_init,
         update = my_update,
         view   = my_view,
@@ -72,7 +69,7 @@ Use `SleepCmd` to schedule any delayed message — not just spinners:
 import "core:time"
 
 // Deliver a custom message after 2 seconds:
-return raw, tui.SleepCmd{
+return m, tui.SleepCmd{
     duration = 2 * time.Second,
     then     = MyTimeoutMsg{},
 }

@@ -1,4 +1,3 @@
-
 package main
 
 import tui "../../../src/tui"
@@ -10,25 +9,23 @@ Model :: struct {
 	chosen: string,
 }
 
-options := []tui.SelectionOption {
+options := []tui.SelectionOption{
 	{label = "Odin", value = "odin"},
-	{label = "C", value = "c"},
-	{label = "Go", value = "go"},
+	{label = "C",    value = "c"},
+	{label = "Go",   value = "go"},
 	{label = "Rust", value = "rust"},
-	{label = "Zig", value = "zig"},
+	{label = "Zig",  value = "zig"},
 }
 
-init :: proc() -> (rawptr, tui.Cmd) {
+init :: proc() -> (^Model, tui.Cmd) {
 	m := new(Model)
 	tui.multiselect_init(&m.sel, options)
 	return m, nil
 }
 
-update :: proc(raw: rawptr, msg: tui.Msg) -> (rawptr, tui.Cmd) {
-	m := cast(^Model)raw
-
+update :: proc(m: ^Model, msg: tui.Msg) -> (^Model, tui.Cmd) {
 	if km, ok := msg.(tui.KeyMsg); ok && km.key == .CtrlC {
-		return raw, tui.quit
+		return m, tui.quit
 	}
 
 	if result, ok := tui.multiselect_update(&m.sel, msg).(tui.MultiSelectDoneMsg); ok {
@@ -38,11 +35,10 @@ update :: proc(raw: rawptr, msg: tui.Msg) -> (rawptr, tui.Cmd) {
 		m.sel.focused = false
 	}
 
-	return raw, nil
+	return m, nil
 }
 
-view :: proc(raw: rawptr) -> string {
-	m := cast(^Model)raw
+view :: proc(m: ^Model) -> string {
 	if m.chosen != "" {
 		return fmt.tprintf("Chosen: %s\r\n\r\nPress Ctrl+C to quit.\r\n", m.chosen)
 	}
@@ -53,5 +49,5 @@ view :: proc(raw: rawptr) -> string {
 }
 
 main :: proc() {
-	tui.run(&tui.Program{init = init, update = update, view = view})
+	tui.run(&tui.Program(Model){init = init, update = update, view = view})
 }

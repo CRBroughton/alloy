@@ -7,7 +7,7 @@ import "core:time"
 
 @(test)
 test_program_struct_has_required_fields :: proc(t: ^testing.T) {
-	p := Program {
+	p := Program(struct{}) {
 		init   = nil,
 		update = nil,
 		view   = nil,

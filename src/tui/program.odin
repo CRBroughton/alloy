@@ -31,10 +31,10 @@ queue_destroy :: proc(q: ^MsgQueue) {
 }
 
 // Program is the top-level runner.
-Program :: struct {
-	init:   proc() -> (rawptr, Cmd),
-	update: proc(model: rawptr, msg: Msg) -> (rawptr, Cmd),
-	view:   proc(model: rawptr) -> string,
+Program :: struct($Model: typeid) {
+	init:   proc() -> (^Model, Cmd),
+	update: proc(_: ^Model, _: Msg) -> (^Model, Cmd),
+	view:   proc(_: ^Model) -> string,
 }
 
 InputThreadData :: struct {
@@ -115,7 +115,7 @@ cleanup_threads :: proc(threads: ^[dynamic]^thread.Thread) {
 
 // --- Render -----------------------------------------------------------------
 
-render :: proc(p: ^Program, model: rawptr) {
+render :: proc(p: ^Program($Model), model: ^Model) {
 	os.write_string(os.stdout, CLEAR_SCREEN)
 	os.write_string(os.stdout, CURSOR_HOME)
 	os.write_string(os.stdout, p.view(model))
@@ -123,7 +123,7 @@ render :: proc(p: ^Program, model: rawptr) {
 
 // --- Event loop -------------------------------------------------------------
 
-run :: proc(p: ^Program) {
+run :: proc(p: ^Program($Model)) {
 	// 1. Terminal setup
 	term: Term
 	if !term_init(&term) do os.exit(1)
