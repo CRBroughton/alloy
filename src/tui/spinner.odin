@@ -34,7 +34,7 @@ spinner_init :: proc(s: ^Spinner, id: int) {
 spinner_start :: proc(s: ^Spinner) -> Cmd {
 	s.active = true
 	s.frame  = 0
-	return SleepCmd{duration = s.interval, then = TickMsg{id = s.id}}
+	return sleep(s.interval, TickMsg{id = s.id})
 }
 
 // spinner_stop halts the spinner. The next TickMsg for this spinner is ignored.
@@ -51,7 +51,7 @@ spinner_update :: proc(s: ^Spinner, msg: Msg) -> Cmd {
 	if !s.active     do return nil
 
 	s.frame = (s.frame + 1) % len(s.frames)
-	return SleepCmd{duration = s.interval, then = TickMsg{id = s.id}}
+	return sleep(s.interval, TickMsg{id = s.id})
 }
 
 // spinner_view renders the current frame. Returns "" when inactive.

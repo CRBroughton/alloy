@@ -81,3 +81,8 @@ Cmd :: union {
 quit :: proc() -> Msg {
 	return QuitMsg{}
 }
+
+// sleep returns a Cmd that waits duration then delivers then to the event loop.
+sleep :: proc(duration: time.Duration, then: Msg) -> Cmd {
+	return SleepCmd{duration = duration, then = then}
+}
