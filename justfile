@@ -10,27 +10,31 @@ develop:
 
 LINKER_FLAGS := "-lGL -lm -lpthread -ldl -lrt -lX11"
 
-# Run the project
-run:
-    odin run src/ -extra-linker-flags:"{{LINKER_FLAGS}}"
-
-# Build debug binary
-build:
-    odin build src/ -out:main -extra-linker-flags:"{{LINKER_FLAGS}}"
-
-# Build optimised release binary
-release:
-    odin build src/ -out:main -o:speed -extra-linker-flags:"{{LINKER_FLAGS}}"
-
-# Clean build artifacts
-clean:
-    rm -f main
-
 # Run tests for all packages
 test:
     -odin test src/
     -odin test src/style/
     -odin test src/tui/
+
+# Run a component example: just example text_input
+example name:
+    odin run examples/components/{{name}}/ -extra-linker-flags:"{{LINKER_FLAGS}}"
+
+# Run text_input example
+example-text-input:
+    odin run examples/components/text_input/ -extra-linker-flags:"{{LINKER_FLAGS}}"
+
+# Run select example
+example-select:
+    odin run examples/components/select/ -extra-linker-flags:"{{LINKER_FLAGS}}"
+
+# Run spinner example
+example-spinner:
+    odin run examples/components/spinner/ -extra-linker-flags:"{{LINKER_FLAGS}}"
+
+# Run confirm example
+example-confirm:
+    odin run examples/components/confirm/ -extra-linker-flags:"{{LINKER_FLAGS}}"
 
 # Show project info
 info:
