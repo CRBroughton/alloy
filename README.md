@@ -1,4 +1,4 @@
-# Alloy
+![Alloy](assets/social-preview-1280x640.png)
 
 A minimal TUI library for Odin, inspired by Bubble Tea.
 
