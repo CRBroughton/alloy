@@ -1,0 +1,29 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: cachix/install-nix-action@v31
+
+      - uses: cachix/cachix-action@v17
+        with:
+          name: alloy
+          authToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
+
+      - name: Run tests
+        shell: nix develop -c bash -e {0}
+        run: just test
+
+      - name: Build examples
+        shell: nix develop -c bash -e {0}
+        run: just build-all

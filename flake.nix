@@ -43,20 +43,9 @@
           "latest" = { compiler = pkgs.odin; lsp = pkgs.ols; };
         };
 
-        # [Step B] Raylib version map.
-        # Odin's vendored bindings emit -lraylib at link time; without raylib in
-        # the shell's buildInputs, nix won't add its lib path and the link fails.
-        # Add new entries here when additional versioned packages appear upstream.
-        raylibVersions = {
-          "latest" = pkgs.raylib;
-        };
-
-        # System libraries that raylib always needs at link time regardless of version.
-        raylibSysDeps = [ pkgs.libGL pkgs.libx11 ];
-
-        # Helper: build a mkShell for a given odin + raylib version pairing.
-        mkOdinShell = v: rl: pkgs.mkShell {
-          buildInputs = [ v.compiler v.lsp rl pkgs.git-cliff ] ++ raylibSysDeps;
+        # Helper: build a mkShell for a given odin version.
+        mkOdinShell = v: pkgs.mkShell {
+          buildInputs = [ v.compiler v.lsp pkgs.git-cliff ];
         };
 
         # [Step B] Create an "Installable" Environment (CRITICAL CONCEPT)
@@ -75,12 +64,10 @@
         packages.default = odinEnvPackage;
 
         # OUTPUT 2: Named Development Shells — one per supported Odin version.
-        # Raylib defaults to "latest" in all shells; override by editing raylibVersions
-        # and passing the desired entry to mkOdinShell if per-shell pinning is needed.
         # Usage:
-        #   nix develop   → latest Odin + latest raylib
-        devShells = builtins.mapAttrs (_: v: mkOdinShell v raylibVersions."latest") versions // {
-          default = mkOdinShell versions."latest" raylibVersions."latest";
+        #   nix develop   → latest Odin + git-cliff
+        devShells = builtins.mapAttrs (_: v: mkOdinShell v) versions // {
+          default = mkOdinShell versions."latest";
         };
       }
     )
@@ -108,12 +95,7 @@
             "latest" = { compiler = pkgs.odin; lsp = pkgs.ols; };
           };
 
-          raylibVersionMap = {
-            "latest" = pkgs.raylib;
-          };
-
-          selected        = versionMap.${cfg.version};
-          selectedRaylib  = raylibVersionMap.${cfg.raylibVersion};
+          selected = versionMap.${cfg.version};
 
           # ols binary path — used to override the VSCode extension's downloaded binary.
           # The danielgavin.ols extension downloads a generic Linux binary that NixOS
@@ -139,16 +121,6 @@
                 packages become available upstream.
               '';
             };
-
-            raylibVersion = mkOption {
-              type = types.enum [ "latest" ];
-              default = "latest";
-              description = ''
-                Raylib version to install alongside Odin. Currently nixpkgs ships
-                a single build (5.5-unstable); more entries will be added as
-                versioned packages become available upstream.
-              '';
-            };
           };
 
           # 2. THE IMPLEMENTATION
@@ -161,7 +133,7 @@
             # `self` refers to this very flake.
             # `pkgs.stdenv.hostPlatform.system` automatically picks the correct
             # architecture (e.g., x86_64-linux) for the user's machine.
-            home.packages = [ selected.compiler selected.lsp selectedRaylib pkgs.libGL pkgs.libx11 pkgs.git-cliff ];
+            home.packages = [ selected.compiler selected.lsp pkgs.git-cliff ];
 
             # B. Configure the Editor
             # ---------------------
