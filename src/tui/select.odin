@@ -16,11 +16,6 @@ Select :: struct {
 	selected_prefix: string,
 }
 
-SelectDoneMsg :: struct {
-	label: string,
-	value: string,
-}
-
 select_init :: proc(s: ^Select, options: []SelectionOption) {
 	s.options = options
 	s.cursor = 0

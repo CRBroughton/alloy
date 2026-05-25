@@ -37,7 +37,6 @@ Program :: struct {
 	view:   proc(model: rawptr) -> string,
 }
 
-// input_thread_data is passed to the input-reading background thread.
 InputThreadData :: struct {
 	queue:   ^MsgQueue,
 	running: ^bool,
@@ -51,22 +50,85 @@ input_thread_proc :: proc(t: ^thread.Thread) {
 	}
 }
 
-// render writes a full frame: clear screen, cursor home, then the view.
+// --- Cmd dispatch -----------------------------------------------------------
+
+CmdThreadData :: struct {
+	queue: ^MsgQueue,
+	fn:    proc() -> Msg,
+}
+
+SleepCmdData :: struct {
+	queue:    ^MsgQueue,
+	duration: time.Duration,
+	then:     Msg,
+}
+
+// dispatch_cmd launches a Cmd on a background thread and appends it to threads
+// so the caller can clean it up later with cleanup_threads.
+// Odin has no thread.detach — we track threads and destroy them once done.
+dispatch_cmd :: proc(queue: ^MsgQueue, cmd: Cmd, threads: ^[dynamic]^thread.Thread) {
+	switch c in cmd {
+	case proc() -> Msg:
+		data := new(CmdThreadData)
+		data.queue = queue
+		data.fn = c
+		t := thread.create(proc(th: ^thread.Thread) {
+			d := cast(^CmdThreadData)th.user_args[0]
+			msg := d.fn()
+			queue_push(d.queue, msg)
+			free(d)
+		})
+		t.user_args[0] = data
+		thread.start(t)
+		append(threads, t)
+	case SleepCmd:
+		data := new(SleepCmdData)
+		data.queue = queue
+		data.duration = c.duration
+		data.then = c.then
+		t := thread.create(proc(th: ^thread.Thread) {
+			d := cast(^SleepCmdData)th.user_args[0]
+			time.sleep(d.duration)
+			queue_push(d.queue, d.then)
+			free(d)
+		})
+		t.user_args[0] = data
+		thread.start(t)
+		append(threads, t)
+	}
+}
+
+// cleanup_threads destroys any cmd threads that have finished.
+// Call this each loop iteration to avoid unbounded thread handle growth.
+cleanup_threads :: proc(threads: ^[dynamic]^thread.Thread) {
+	i := 0
+	for i < len(threads) {
+		t := threads[i]
+		if thread.is_done(t) {
+			thread.destroy(t)
+			unordered_remove(threads, i)
+		} else {
+			i += 1
+		}
+	}
+}
+
+// --- Render -----------------------------------------------------------------
+
 render :: proc(p: ^Program, model: rawptr) {
 	os.write_string(os.stdout, CLEAR_SCREEN)
 	os.write_string(os.stdout, CURSOR_HOME)
 	os.write_string(os.stdout, p.view(model))
 }
 
-// run starts the event loop. Blocks until update returns a quit Cmd.
+// --- Event loop -------------------------------------------------------------
+
 run :: proc(p: ^Program) {
 	// 1. Terminal setup
 	term: Term
 	if !term_init(&term) do os.exit(1)
 	term_raw(&term)
 	defer term_restore(&term)
-	// Enter alternate screen: clean slate, no scrollback pollution.
-	// On exit (defer runs in reverse) we leave alt screen and restore the cursor.
 	os.write_string(os.stdout, ALT_SCREEN_ENTER)
 	defer os.write_string(os.stdout, ALT_SCREEN_EXIT)
 	defer os.write_string(os.stdout, CURSOR_SHOW)
@@ -76,7 +138,17 @@ run :: proc(p: ^Program) {
 	queue.msgs = make([dynamic]Msg)
 	defer queue_destroy(&queue)
 
-	// 3. Input thread
+	// 3. Cmd thread tracker
+	cmd_threads := make([dynamic]^thread.Thread)
+	defer {
+		for t in cmd_threads {
+			thread.join(t)
+			thread.destroy(t)
+		}
+		delete(cmd_threads)
+	}
+
+	// 4. Input thread
 	running := true
 	thread_data := InputThreadData {
 		queue   = &queue,
@@ -91,23 +163,24 @@ run :: proc(p: ^Program) {
 		thread.destroy(input_t)
 	}
 
-	// 4. Init the model
+	// 5. Init model — dispatch any startup command (e.g. spinner first tick)
 	model, first_cmd := p.init()
 	if first_cmd != nil {
-		cmd_msg := first_cmd()
-		queue_push(&queue, cmd_msg)
+		dispatch_cmd(&queue, first_cmd, &cmd_threads)
 	}
 
-	// 5. Hide cursor and do the first render immediately
+	// 6. First render
 	os.write_string(os.stdout, CURSOR_HIDE)
 	render(p, model)
 
-	// 6. Send initial window size
+	// 7. Window size
 	w, h := term_size()
 	queue_push(&queue, WindowSizeMsg{width = w, height = h})
 
-	// 7. Event loop
+	// 8. Event loop
 	for {
+		cleanup_threads(&cmd_threads)
+
 		msg, ok := queue_pop(&queue)
 		if !ok {
 			time.sleep(time.Millisecond * 8)
@@ -122,11 +195,7 @@ run :: proc(p: ^Program) {
 		model = new_model
 
 		if cmd != nil {
-			cmd_msg := cmd()
-			if _, is_quit := cmd_msg.(QuitMsg); is_quit {
-				break
-			}
-			queue_push(&queue, cmd_msg)
+			dispatch_cmd(&queue, cmd, &cmd_threads)
 		}
 
 		render(p, model)

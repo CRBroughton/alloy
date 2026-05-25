@@ -1,5 +1,7 @@
 package tui
 
+import "core:time"
+
 Key :: enum {
 	Unknown,
 	Rune,
@@ -31,16 +33,35 @@ WindowSizeMsg :: struct {
 	height: int,
 }
 
-QuitMsg :: struct {}
+QuitMsg      :: struct {}
+TickMsg      :: struct { id: int }
+SelectDoneMsg :: struct { label, value: string }
+
+// SleepCmd is a Cmd that pauses for `duration` then delivers `then` to the loop.
+// Use this wherever you need timer-driven updates (spinners, debounced input, etc.)
+// Odin proc literals cannot capture outer-scope variables, so timed commands
+// carry their data here rather than inside a closure.
+SleepCmd :: struct {
+	duration: time.Duration,
+	then:     Msg,
+}
 
 Msg :: union {
 	KeyMsg,
 	WindowSizeMsg,
 	QuitMsg,
 	SelectDoneMsg,
+	TickMsg,
 }
 
-Cmd :: #type proc() -> Msg
+// Cmd is either:
+//   proc() -> Msg   — a function run on a background thread
+//   SleepCmd        — sleep for a duration, then deliver a Msg
+// nil means no command.
+Cmd :: union {
+	proc() -> Msg,
+	SleepCmd,
+}
 
 quit :: proc() -> Msg {
 	return QuitMsg{}
