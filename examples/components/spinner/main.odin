@@ -1,31 +1,31 @@
 package main
 
-import tui "../../../src/alloy"
+import alloy "../../../src/alloy"
 import "core:fmt"
 
 Model :: struct {
-	spinner: tui.Spinner,
+	spinner: alloy.Spinner,
 }
 
-init :: proc() -> (^Model, tui.Cmd) {
+init :: proc() -> (^Model, alloy.Cmd) {
 	m := new(Model)
-	tui.spinner_init(&m.spinner, 1)
+	alloy.spinner_init(&m.spinner, 1)
 	m.spinner.label = "Working..."
-	return m, tui.spinner_start(&m.spinner)
+	return m, alloy.spinner_start(&m.spinner)
 }
 
-update :: proc(m: ^Model, msg: tui.Msg) -> (^Model, tui.Cmd) {
-	if km, ok := msg.(tui.KeyMsg); ok && km.key == .CtrlC {
-		return m, tui.quit
+update :: proc(m: ^Model, msg: alloy.Msg) -> (^Model, alloy.Cmd) {
+	if km, ok := msg.(alloy.KeyMsg); ok && km.key == .CtrlC {
+		return m, alloy.quit
 	}
 
-	return m, tui.spinner_update(&m.spinner, msg)
+	return m, alloy.spinner_update(&m.spinner, msg)
 }
 
 view :: proc(m: ^Model) -> string {
-	return fmt.tprintf("Spinner demo\r\n\r\n%s\r\n\r\nPress Ctrl+C to quit.\r\n", tui.spinner_view(m.spinner))
+	return fmt.tprintf("Spinner demo\r\n\r\n%s\r\n\r\nPress Ctrl+C to quit.\r\n", alloy.spinner_view(m.spinner))
 }
 
 main :: proc() {
-	tui.run(&tui.Program(Model){init = init, update = update, view = view})
+	alloy.run(&alloy.Program(Model){init = init, update = update, view = view})
 }

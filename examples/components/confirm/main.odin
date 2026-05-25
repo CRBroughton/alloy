@@ -1,25 +1,25 @@
 package main
 
-import tui "../../../src/alloy"
+import alloy "../../../src/alloy"
 import "core:fmt"
 
 Model :: struct {
-	confirm: tui.Confirm,
+	confirm: alloy.Confirm,
 	answer:  string,
 }
 
-init :: proc() -> (^Model, tui.Cmd) {
+init :: proc() -> (^Model, alloy.Cmd) {
 	m := new(Model)
-	tui.confirm_init(&m.confirm, "Delete all files?", false)
+	alloy.confirm_init(&m.confirm, "Delete all files?", false)
 	return m, nil
 }
 
-update :: proc(m: ^Model, msg: tui.Msg) -> (^Model, tui.Cmd) {
-	if km, ok := msg.(tui.KeyMsg); ok && km.key == .CtrlC {
-		return m, tui.quit
+update :: proc(m: ^Model, msg: alloy.Msg) -> (^Model, alloy.Cmd) {
+	if km, ok := msg.(alloy.KeyMsg); ok && km.key == .CtrlC {
+		return m, alloy.quit
 	}
 
-	if result, ok := tui.confirm_update(&m.confirm, msg).(tui.ConfirmMsg); ok {
+	if result, ok := alloy.confirm_update(&m.confirm, msg).(alloy.ConfirmMsg); ok {
 		m.answer = result.confirmed ? "Yes" : "No"
 		m.confirm.focused = false
 	}
@@ -31,9 +31,9 @@ view :: proc(m: ^Model) -> string {
 	if m.answer != "" {
 		return fmt.tprintf("Answer: %s\r\n\r\nPress Ctrl+C to quit.\r\n", m.answer)
 	}
-	return fmt.tprintf("Confirm demo\r\n\r\n%s\r\n", tui.confirm_view(m.confirm))
+	return fmt.tprintf("Confirm demo\r\n\r\n%s\r\n", alloy.confirm_view(m.confirm))
 }
 
 main :: proc() {
-	tui.run(&tui.Program(Model){init = init, update = update, view = view})
+	alloy.run(&alloy.Program(Model){init = init, update = update, view = view})
 }

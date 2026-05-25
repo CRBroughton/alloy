@@ -1,15 +1,15 @@
 package main
 
-import tui "../../../src/alloy"
+import alloy "../../../src/alloy"
 import "core:fmt"
 import "core:strings"
 
 Model :: struct {
-	sel:    tui.MultiSelect,
+	sel:    alloy.MultiSelect,
 	chosen: string,
 }
 
-options := []tui.SelectionOption{
+options := []alloy.SelectionOption{
 	{label = "Odin", value = "odin"},
 	{label = "C",    value = "c"},
 	{label = "Go",   value = "go"},
@@ -17,19 +17,19 @@ options := []tui.SelectionOption{
 	{label = "Zig",  value = "zig"},
 }
 
-init :: proc() -> (^Model, tui.Cmd) {
+init :: proc() -> (^Model, alloy.Cmd) {
 	m := new(Model)
-	tui.multiselect_init(&m.sel, options)
+	alloy.multiselect_init(&m.sel, options)
 	return m, nil
 }
 
-update :: proc(m: ^Model, msg: tui.Msg) -> (^Model, tui.Cmd) {
-	if km, ok := msg.(tui.KeyMsg); ok && km.key == .CtrlC {
-		return m, tui.quit
+update :: proc(m: ^Model, msg: alloy.Msg) -> (^Model, alloy.Cmd) {
+	if km, ok := msg.(alloy.KeyMsg); ok && km.key == .CtrlC {
+		return m, alloy.quit
 	}
 
-	if _, ok := tui.multiselect_update(&m.sel, msg).(tui.MultiSelectDoneMsg); ok {
-		labels := tui.multiselect_selected_labels(&m.sel)
+	if _, ok := alloy.multiselect_update(&m.sel, msg).(alloy.MultiSelectDoneMsg); ok {
+		labels := alloy.multiselect_selected_labels(&m.sel)
 		m.chosen = strings.join(labels, ", ")
 		m.sel.focused = false
 	}
@@ -43,10 +43,10 @@ view :: proc(m: ^Model) -> string {
 	}
 	return fmt.tprintf(
 		"MultiSelect demo\r\n\r\n%s\r\nSpace to toggle, Enter to confirm, Ctrl+C to quit.\r\n",
-		tui.multiselect_view(m.sel),
+		alloy.multiselect_view(m.sel),
 	)
 }
 
 main :: proc() {
-	tui.run(&tui.Program(Model){init = init, update = update, view = view})
+	alloy.run(&alloy.Program(Model){init = init, update = update, view = view})
 }
