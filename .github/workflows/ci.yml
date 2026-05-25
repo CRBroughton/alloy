@@ -22,3 +22,4 @@ jobs:
       - name: Build examples
         shell: nix develop -c bash -e {0}
         run: just build-all
+

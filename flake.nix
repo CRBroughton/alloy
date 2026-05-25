@@ -45,7 +45,7 @@
 
         # Helper: build a mkShell for a given odin version.
         mkOdinShell = v: pkgs.mkShell {
-          buildInputs = [ v.compiler v.lsp pkgs.git-cliff ];
+          buildInputs = [ v.compiler v.lsp pkgs.git-cliff pkgs.just ];
         };
 
         # [Step B] Create an "Installable" Environment (CRITICAL CONCEPT)
@@ -133,7 +133,7 @@
             # `self` refers to this very flake.
             # `pkgs.stdenv.hostPlatform.system` automatically picks the correct
             # architecture (e.g., x86_64-linux) for the user's machine.
-            home.packages = [ selected.compiler selected.lsp pkgs.git-cliff ];
+            home.packages = [ selected.compiler selected.lsp pkgs.git-cliff pkgs.just ];
 
             # B. Configure the Editor
             # ---------------------
