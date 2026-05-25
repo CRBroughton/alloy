@@ -63,25 +63,20 @@ main :: proc() {
 
 ## Timer-based commands
 
-Use `SleepCmd` to schedule any delayed message — not just spinners:
+Use `sleep` to schedule any delayed message, not just spinners:
 
 ```odin
 import "core:time"
 
 // Deliver a custom message after 2 seconds:
-return m, alloy.SleepCmd{
-    duration = 2 * time.Second,
-    then = MyTimeoutMsg{},
-}
+return m, alloy.sleep(2 * time.Second, MyTimeoutMsg{})
 ```
 
-Add `MyTimeoutMsg` to the `Msg` union in `types.odin`.
+`sleep` accepts any value that satisfies the `Msg` union; define your own message types in your app.
 
 
 ## Running tests
 
 ```sh
-odin test src/tui/
-# or
 just test
 ```
