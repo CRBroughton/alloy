@@ -4,6 +4,7 @@
   "conventionalCommits.scopes": [
     "dependencies",
     "ansi",
-    "types"
+    "types",
+    "program"
   ]
 }
