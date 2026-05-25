@@ -8,7 +8,7 @@ default:
 develop:
     nix develop github:crbroughton/nix-flakes?dir=odin
 
-LINKER_FLAGS := "-lGL -lm -lpthread -ldl -lrt -lX11"
+LINKER_FLAGS := "-lm -lpthread -ldl -lrt"
 
 # Run tests for all packages
 test:
