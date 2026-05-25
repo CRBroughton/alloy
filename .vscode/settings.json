@@ -1,4 +1,8 @@
 {
   "ols.server.path": "ols",
-  "editor.formatOnSave": true
+  "editor.formatOnSave": true,
+  "conventionalCommits.scopes": [
+    "dependencies",
+    "ansi"
+  ]
 }
