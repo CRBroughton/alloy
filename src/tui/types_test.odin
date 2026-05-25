@@ -66,7 +66,7 @@ test_type_switch_dispatches_correctly :: proc(t: ^testing.T) {
 	got_quit := false
 
 	for msg in msgs {
-		switch m in msg {
+		#partial switch m in msg {
 		case KeyMsg:
 			got_key = true
 			testing.expect_value(t, m.key, Key.CtrlC)

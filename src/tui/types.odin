@@ -37,6 +37,7 @@ Msg :: union {
 	KeyMsg,
 	WindowSizeMsg,
 	QuitMsg,
+	SelectDoneMsg,
 }
 
 Cmd :: #type proc() -> Msg
