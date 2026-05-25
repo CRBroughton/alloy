@@ -56,7 +56,7 @@
 
         # Helper: build a mkShell for a given odin + raylib version pairing.
         mkOdinShell = v: rl: pkgs.mkShell {
-          buildInputs = [ v.compiler v.lsp rl ] ++ raylibSysDeps;
+          buildInputs = [ v.compiler v.lsp rl pkgs.git-cliff ] ++ raylibSysDeps;
         };
 
         # [Step B] Create an "Installable" Environment (CRITICAL CONCEPT)
@@ -161,7 +161,7 @@
             # `self` refers to this very flake.
             # `pkgs.stdenv.hostPlatform.system` automatically picks the correct
             # architecture (e.g., x86_64-linux) for the user's machine.
-            home.packages = [ selected.compiler selected.lsp selectedRaylib pkgs.libGL pkgs.libx11 ];
+            home.packages = [ selected.compiler selected.lsp selectedRaylib pkgs.libGL pkgs.libx11 pkgs.git-cliff ];
 
             # B. Configure the Editor
             # ---------------------

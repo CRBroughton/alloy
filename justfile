@@ -48,3 +48,19 @@ info:
     @echo "Odin Demo Project"
     @echo "================="
     @echo "Source: src/main.odin"
+
+# Preview unreleased changelog entries
+changelog-preview:
+    git cliff --unreleased
+
+# Write full CHANGELOG.md
+changelog:
+    git cliff -o CHANGELOG.md
+
+# Tag a new release and update CHANGELOG.md: just release v0.1.0
+release tag:
+    git cliff --tag {{tag}} -o CHANGELOG.md
+    git add CHANGELOG.md
+    git commit -m "chore(release): :bookmark: prepare {{tag}}"
+    git tag -a {{tag}} -m "Release {{tag}}"
+    @echo "Run: git push && git push origin {{tag}}"
