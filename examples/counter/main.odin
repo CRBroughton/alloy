@@ -13,7 +13,7 @@ init :: proc() -> (^Model, alloy.Cmd) {
 
 update :: proc(m: ^Model, msg: alloy.Msg) -> (^Model, alloy.Cmd) {
 	if km, ok := msg.(alloy.KeyMsg); ok {
-		if km.key == .CtrlC                    do return m, alloy.quit
+		if km.key == .CtrlC do return m, alloy.quit
 		if km.key == .Rune && km.rune == '+' do m.count += 1
 		if km.key == .Rune && km.rune == '-' do m.count -= 1
 	}
