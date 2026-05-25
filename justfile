@@ -26,6 +26,12 @@ release:
 clean:
     rm -f main
 
+# Run tests for all packages
+test:
+    -odin test src/
+    -odin test src/style/
+    -odin test src/tui/
+
 # Show project info
 info:
     @echo "Odin Demo Project"

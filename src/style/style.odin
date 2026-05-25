@@ -1,4 +1,4 @@
-package ansi
+package style
 
 import "core:fmt"
 RESET :: "\033[0m"
