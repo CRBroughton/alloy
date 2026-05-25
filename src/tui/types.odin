@@ -33,9 +33,13 @@ WindowSizeMsg :: struct {
 	height: int,
 }
 
-QuitMsg      :: struct {}
-TickMsg      :: struct { id: int }
-SelectDoneMsg :: struct { label, value: string }
+QuitMsg :: struct {}
+TickMsg :: struct {
+	id: int,
+}
+SelectDoneMsg :: struct {
+	label, value: string,
+}
 
 // SleepCmd is a Cmd that pauses for `duration` then delivers `then` to the loop.
 // Use this wherever you need timer-driven updates (spinners, debounced input, etc.)
@@ -46,12 +50,17 @@ SleepCmd :: struct {
 	then:     Msg,
 }
 
+ConfirmMsg :: struct {
+	confirmed: bool,
+}
+
 Msg :: union {
 	KeyMsg,
 	WindowSizeMsg,
 	QuitMsg,
 	SelectDoneMsg,
 	TickMsg,
+	ConfirmMsg,
 }
 
 // Cmd is either:

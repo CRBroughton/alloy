@@ -59,6 +59,7 @@ main :: proc() {
 - **TextInput**: single-line text field with cursor, placeholder, and focus state
 - **Select**: keyboard-navigable option list; returns `SelectDoneMsg` on confirm
 - **Spinner**: animated indicator driven by a self-scheduling `SleepCmd` timer
+- **Confirm**: yes/no prompt with configurable default; returns `ConfirmMsg` on answer
 
 ---
 
