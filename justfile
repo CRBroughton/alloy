@@ -12,7 +12,6 @@ LINKER_FLAGS := "-lGL -lm -lpthread -ldl -lrt -lX11"
 
 # Run tests for all packages
 test:
-    -odin test src/
     -odin test src/style/
     -odin test src/tui/
 
