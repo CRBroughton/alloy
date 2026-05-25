@@ -4,40 +4,48 @@ import tui "./tui"
 import "core:fmt"
 
 AppModel :: struct {
-	count:   int,
-	message: string,
+	input:     tui.TextInput,
+	submitted: string,
 }
 
 app_init :: proc() -> (rawptr, tui.Cmd) {
 	model := new(AppModel)
-	model.count = 0
-	model.message = "Press + to increment, q to quit"
+	tui.text_input_init(&model.input)
+	model.input.placeholder = "Type something..."
+	model.input.prompt = "› "
 	return model, nil
 }
 
 app_update :: proc(raw: rawptr, msg: tui.Msg) -> (rawptr, tui.Cmd) {
 	model := cast(^AppModel)raw
 
-	switch m in msg {
-	case tui.KeyMsg:
-		#partial switch m.key {
-		case .Rune:
-			if m.rune == '+' do model.count += 1
-			if m.rune == 'q' do return raw, tui.quit
+	// Let the text input handle most keys
+	tui.text_input_update(&model.input, msg)
+
+	// Handle keys the parent cares about
+	if km, ok := msg.(tui.KeyMsg); ok {
+		#partial switch km.key {
+		case .Enter:
+			model.submitted = tui.text_input_value(model.input)
+			tui.text_input_set(&model.input, "")
 		case .CtrlC:
 			return raw, tui.quit
 		case:
-		// ignore
 		}
-	case tui.WindowSizeMsg, tui.QuitMsg:
-	// ignore for now
 	}
+
 	return raw, nil
 }
 
 app_view :: proc(raw: rawptr) -> string {
 	model := cast(^AppModel)raw
-	return fmt.tprintf("%s\n\nCount: %d\n", model.message, model.count)
+	header := "Text Input Demo  (Enter to submit, Ctrl+C to quit)\r\n\r\n"
+	input := tui.text_input_view(model.input)
+	submitted := ""
+	if model.submitted != "" {
+		submitted = fmt.tprintf("\r\n\r\nLast submitted: %s", model.submitted)
+	}
+	return fmt.tprintf("%s%s%s\r\n", header, input, submitted)
 }
 
 main :: proc() {
