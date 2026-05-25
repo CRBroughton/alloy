@@ -54,10 +54,7 @@ ConfirmMsg :: struct {
 	confirmed: bool,
 }
 
-MultiSelectDoneMsg :: struct {
-	labels: []string,
-	values: []string,
-}
+MultiSelectDoneMsg :: struct {}
 
 Msg :: union {
 	KeyMsg,

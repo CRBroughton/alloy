@@ -4,23 +4,32 @@ import style "../style"
 import "core:fmt"
 
 MultiSelect :: struct {
-	options:  []SelectionOption,
-	cursor:   int,
-	selected: []bool,
-	focused:  bool,
+	options:        []SelectionOption, // borrowed — caller owns
+	cursor:         int,
+	selected:       []bool,            // owned — allocated by multiselect_init
+	focused:        bool,
+	_result_labels: [dynamic]string,   // owned — read via accessor after MultiSelectDoneMsg
+	_result_values: [dynamic]string,
 }
 
 multiselect_init :: proc(s: ^MultiSelect, options: []SelectionOption) {
-	s.options = options
-	s.cursor = 0
-	s.focused = true
-	s.selected = make([]bool, len(options))
+	s.options        = options
+	s.cursor         = 0
+	s.focused        = true
+	s.selected       = make([]bool, len(options))
+	s._result_labels = make([dynamic]string)
+	s._result_values = make([dynamic]string)
 }
 
 multiselect_destroy :: proc(s: ^MultiSelect) {
 	delete(s.selected)
+	delete(s._result_labels)
+	delete(s._result_values)
 }
 
+// multiselect_update handles keyboard input.
+// Returns MultiSelectDoneMsg{} (signal only) on Enter.
+// Read the selection via multiselect_selected_labels / multiselect_selected_values.
 multiselect_update :: proc(s: ^MultiSelect, msg: Msg) -> Msg {
 	if !s.focused do return nil
 
@@ -41,18 +50,29 @@ multiselect_update :: proc(s: ^MultiSelect, msg: Msg) -> Msg {
 			s.selected[s.cursor] = !s.selected[s.cursor]
 		}
 	case .Enter:
-		labels := make([dynamic]string)
-		values := make([dynamic]string)
-		for selected, i in s.selected {
-			if selected {
-				append(&labels, s.options[i].label)
-				append(&values, s.options[i].value)
-
+		clear(&s._result_labels)
+		clear(&s._result_values)
+		for sel, i in s.selected {
+			if sel {
+				append(&s._result_labels, s.options[i].label)
+				append(&s._result_values, s.options[i].value)
 			}
 		}
-		return MultiSelectDoneMsg{labels = labels[:], values = values[:]}
+		return MultiSelectDoneMsg{}
 	}
 	return nil
+}
+
+// multiselect_selected_labels returns selected labels.
+// Valid until the next Enter keypress.
+multiselect_selected_labels :: proc(s: ^MultiSelect) -> []string {
+	return s._result_labels[:]
+}
+
+// multiselect_selected_values returns selected values.
+// Valid until the next Enter keypress.
+multiselect_selected_values :: proc(s: ^MultiSelect) -> []string {
+	return s._result_values[:]
 }
 
 multiselect_view :: proc(s: MultiSelect) -> string {

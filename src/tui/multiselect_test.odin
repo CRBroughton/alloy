@@ -68,19 +68,18 @@ test_multiselect_enter_returns_selected :: proc(t: ^testing.T) {
 	multiselect_init(&s, test_ms_options[:])
 	defer multiselect_destroy(&s)
 
-	// Select item 1 ("Beta")
 	multiselect_update(&s, ms_key(.Down))
 	multiselect_update(&s, ms_space())
 
 	result := multiselect_update(&s, ms_key(.Enter))
-	done, ok := result.(MultiSelectDoneMsg)
+	_, ok := result.(MultiSelectDoneMsg)
 	testing.expect(t, ok, "Enter should return MultiSelectDoneMsg")
-	testing.expect_value(t, len(done.values), 1)
-	testing.expect_value(t, done.values[0], "beta")
-	testing.expect_value(t, done.labels[0], "Beta")
 
-	delete(done.labels)
-	delete(done.values)
+	values := multiselect_selected_values(&s)
+	labels := multiselect_selected_labels(&s)
+	testing.expect_value(t, len(values), 1)
+	testing.expect_value(t, values[0], "beta")
+	testing.expect_value(t, labels[0], "Beta")
 }
 
 @(test)
@@ -90,12 +89,9 @@ test_multiselect_enter_empty_selection :: proc(t: ^testing.T) {
 	defer multiselect_destroy(&s)
 
 	result := multiselect_update(&s, ms_key(.Enter))
-	done, ok := result.(MultiSelectDoneMsg)
+	_, ok := result.(MultiSelectDoneMsg)
 	testing.expect(t, ok, "Enter should return MultiSelectDoneMsg even with nothing selected")
-	testing.expect_value(t, len(done.values), 0)
-
-	delete(done.labels)
-	delete(done.values)
+	testing.expect_value(t, len(multiselect_selected_values(&s)), 0)
 }
 
 @(test)
