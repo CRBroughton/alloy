@@ -1,32 +1,10 @@
 package alloy
 
 import "core:time"
+import components "../components"
 
-Key :: enum {
-	Unknown,
-	Rune,
-	Up,
-	Down,
-	Left,
-	Right,
-	Home,
-	End,
-	PageUp,
-	PageDown,
-	Enter,
-	Backspace,
-	Delete,
-	Tab,
-	Escape,
-	CtrlC,
-	CtrlD,
-	CtrlL,
-}
-
-KeyMsg :: struct {
-	key:  Key,
-	rune: rune,
-}
+Key    :: components.Key
+KeyMsg :: components.KeyMsg
 
 WindowSizeMsg :: struct {
 	width:  int,

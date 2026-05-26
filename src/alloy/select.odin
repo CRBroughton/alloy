@@ -1,24 +1,21 @@
 package alloy
 
 import style "../style"
+import components "../components"
 import "core:fmt"
 
-SelectionOption :: struct {
-	label: string,
-	value: string,
-}
+// SelectionOption is an alias for the shared SelectOption type.
+SelectionOption :: components.SelectOption
 
 Select :: struct {
-	options:         []SelectionOption,
-	cursor:          int,
+	using state:     components.SelectState,
 	focused:         bool,
 	cursor_prefix:   string,
 	selected_prefix: string,
 }
 
 select_init :: proc(s: ^Select, options: []SelectionOption) {
-	s.options = options
-	s.cursor = 0
+	s.state = components.select_init(options)
 	s.focused = true
 	s.cursor_prefix = "› "
 	s.selected_prefix = "✔ "
@@ -26,28 +23,15 @@ select_init :: proc(s: ^Select, options: []SelectionOption) {
 
 // select_update handles keyboard navigation for a Select component.
 // Returns a SelectDoneMsg when the user confirms a selection, nil otherwise.
-// Odin proc literals do not capture outer scope variables, so the selection
-// result is returned as a Msg directly rather than wrapped in a Cmd.
 select_update :: proc(s: ^Select, msg: Msg) -> Msg {
 	if !s.focused do return nil
-
 	km, ok := msg.(KeyMsg)
 	if !ok do return nil
 
-	#partial switch km.key {
-	case .Up:
-		s.cursor = max(s.cursor - 1, 0)
-	case .Down:
-		s.cursor = min(s.cursor + 1, len(s.options) - 1)
-	case .Home:
-		s.cursor = 0
-	case .End:
-		s.cursor = len(s.options) - 1
-	case .Enter:
-		if len(s.options) > 0 {
-			chosen := s.options[s.cursor]
-			return SelectDoneMsg{value = chosen.value, label = chosen.label}
-		}
+	submitted := components.select_update(&s.state, km)
+	if submitted {
+		chosen := components.select_selected(s.state)
+		return SelectDoneMsg{value = chosen.value, label = chosen.label}
 	}
 	return nil
 }

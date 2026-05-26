@@ -8,10 +8,10 @@ Model :: struct {
 	chosen: string,
 }
 
-options := []alloy.SelectionOption{
+options := []alloy.SelectionOption {
 	{label = "Odin", value = "odin"},
-	{label = "C",    value = "c"},
-	{label = "Go",   value = "go"},
+	{label = "C", value = "c"},
+	{label = "Go", value = "go"},
 	{label = "Rust", value = "rust"},
 }
 
@@ -38,7 +38,10 @@ view :: proc(m: ^Model) -> string {
 	if m.chosen != "" {
 		return fmt.tprintf("You chose: %s\r\n\r\nPress Ctrl+C to quit.\r\n", m.chosen)
 	}
-	return fmt.tprintf("Select demo\r\n\r\n%s\r\nPress Ctrl+C to quit.\r\n", alloy.select_view(m.sel))
+	return fmt.tprintf(
+		"Select demo\r\n\r\n%s\r\nPress Ctrl+C to quit.\r\n",
+		alloy.select_view(m.sel),
+	)
 }
 
 main :: proc() {
