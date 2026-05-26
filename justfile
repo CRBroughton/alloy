@@ -13,7 +13,17 @@ LINKER_FLAGS := "-lm -lpthread -ldl -lrt"
 # Run tests for all packages
 test:
     -odin test src/style/
+    -odin test src/components/
     -odin test src/alloy/
+    -odin test src/forge/
+
+# Run forge tests only
+test-forge:
+    odin test src/forge/
+
+# Run component tests only
+test-components:
+    odin test src/components/
 
 # Build all examples into build/ (no execution; used in CI)
 build-all:
@@ -26,10 +36,15 @@ build-all:
     odin build examples/components/multiselect/ -out:build/multiselect    -extra-linker-flags:"{{LINKER_FLAGS}}"
     odin build examples/components/grid/        -out:build/grid            -extra-linker-flags:"{{LINKER_FLAGS}}"
     odin build examples/components/box/         -out:build/box             -extra-linker-flags:"{{LINKER_FLAGS}}"
+    odin build examples/forge/step/             -out:build/forge-step      -extra-linker-flags:"{{LINKER_FLAGS}}"
 
 # Remove build artifacts
 clean:
     rm -rf build/
+
+# Run forge step example
+example-forge-step:
+    odin run examples/forge/step/ -extra-linker-flags:"{{LINKER_FLAGS}}"
 
 # Run box example
 example-box:
