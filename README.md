@@ -1,13 +1,23 @@
 ![Alloy](assets/social-preview-1280x640.png)
 
-A minimal TUI library for Odin, inspired by Bubble Tea.
+A TUI framework for Odin. Two packages; one repo.
 
-## Install
+- **alloy** — full-screen TUI apps using the Elm Architecture (init / update / view)
+- **forge** — inline CLI wizards; step-by-step prompts that stay in the terminal scroll history
 
-Copy `src/alloy/` into your project's `vendor/` folder:
+---
+
+## alloy
+
+Inspired by Bubble Tea. Full-screen, alternate-screen buffer, event loop driven.
+
+### Install
+
+Copy `src/alloy/` and `src/components/` into your project's `vendor/` folder:
 
 ```sh
 cp -r src/alloy/ your-project/vendor/alloy/
+cp -r src/components/ your-project/vendor/components/
 ```
 
 Then import:
@@ -16,7 +26,7 @@ Then import:
 import alloy "vendor/alloy"
 ```
 
-## Quick start
+### Quick start
 
 ```odin
 package main
@@ -51,17 +61,17 @@ main :: proc() {
 }
 ```
 
-## Components
+### Components
 
 - **TextInput**: single-line text field with cursor, placeholder, and focus state
 - **Select**: keyboard-navigable option list; returns `SelectDoneMsg` on confirm
 - **Spinner**: animated indicator driven by a self-scheduling `SleepCmd` timer
 - **Confirm**: yes/no prompt with configurable default; returns `ConfirmMsg` on answer
 - **MultiSelect**: checkbox list; Space to toggle, Enter to confirm; returns `MultiSelectDoneMsg`
+- **Box**: bordered container with title and four border styles (Rounded, Single, Double, Heavy)
+- **Grid**: column-based layout with `fr` and `Fixed` track types and configurable gap
 
----
-
-## Timer-based commands
+### Timer-based commands
 
 Use `sleep` to schedule any delayed message, not just spinners:
 
@@ -74,6 +84,73 @@ return m, alloy.sleep(2 * time.Second, MyTimeoutMsg{})
 
 `sleep` accepts any value that satisfies the `Msg` union; define your own message types in your app.
 
+---
+
+## forge
+
+Inspired by Clack. Inline wizard prompts; no alternate screen. Each completed step stays visible in the terminal.
+
+### Install
+
+Copy `src/forge/` and `src/components/` into your project's `vendor/` folder:
+
+```sh
+cp -r src/forge/ your-project/vendor/forge/
+cp -r src/components/ your-project/vendor/components/
+```
+
+Then import:
+
+```odin
+import forge "vendor/forge"
+```
+
+### Quick start
+
+Chain prompts sequentially; check `.status` after each step to handle cancellation:
+
+```odin
+package main
+
+import "core:fmt"
+import forge "vendor/forge"
+
+main :: proc() {
+    name := forge.run_text_prompt("Project name?", "my-app")
+    if name.status == .Cancelled do return
+
+    framework := forge.run_select_prompt("Framework?", []forge.SelectOption{
+        {label = "React",  value = "react"},
+        {label = "Vue",    value = "vue"},
+        {label = "Svelte", value = "svelte"},
+    })
+    if framework.status == .Cancelled do return
+
+    install := forge.run_confirm_prompt("Install dependencies?")
+    if install.status == .Cancelled do return
+
+    forge.wizard_end()
+
+    fmt.printf("Creating %s with %s...\n", name.value, framework.value)
+}
+```
+
+### Prompts
+
+- **run_text_prompt**: single-line text input with optional placeholder; supports `mask = true` for passwords
+- **run_select_prompt**: arrow-key navigable option list; returns the selected value
+- **run_confirm_prompt**: Yes/No toggle with Left/Right arrows and `y`/`n` shortcuts
+
+Each prompt returns a `StepResult`:
+
+```odin
+StepResult :: struct {
+    value:  string,
+    status: StepStatus, // .Done, .Cancelled, .Error
+}
+```
+
+---
 
 ## Running tests
 
