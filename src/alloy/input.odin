@@ -1,7 +1,7 @@
 package alloy
 
 import "core:os"
-import components "../components"
+import components "../alloy-components"
 
 // read_key blocks until a keypress is available, then returns a KeyMsg.
 // Call this in a loop from a background thread (see chapter 6).

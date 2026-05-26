@@ -3,7 +3,7 @@ package forge
 import "core:fmt"
 import "core:os"
 import posix "core:sys/posix"
-import components "../components"
+import components "../alloy-components"
 
 // raw_mode_enter puts the terminal into raw mode WITHOUT entering the
 // alternate screen buffer. Completed step output stays in scroll history.

@@ -2,7 +2,7 @@ package forge
 
 import "core:fmt"
 import style "../style"
-import components "../components"
+import components "../alloy-components"
 
 ConfirmPromptState :: struct {
 	using state: components.ConfirmState,

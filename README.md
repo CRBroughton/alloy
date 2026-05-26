@@ -1,9 +1,9 @@
 ![Alloy](assets/social-preview-1280x640.png)
 
-A TUI framework for Odin. Two packages; one repo.
+A TUI framework for Odin;
 
-- **alloy** — full-screen TUI apps using the Elm Architecture (init / update / view)
-- **forge** — inline CLI wizards; step-by-step prompts that stay in the terminal scroll history
+- **alloy** - full-screen TUI apps using the Elm Architecture (init / update / view)
+- **forge** - inline CLI wizards; step-by-step prompts that stay in the terminal scroll history
 
 ---
 
@@ -13,11 +13,11 @@ Inspired by Bubble Tea. Full-screen, alternate-screen buffer, event loop driven.
 
 ### Install
 
-Copy `src/alloy/` and `src/components/` into your project's `vendor/` folder:
+Copy `src/alloy/` and `src/alloy-components/` into your project's `vendor/` folder:
 
 ```sh
 cp -r src/alloy/ your-project/vendor/alloy/
-cp -r src/components/ your-project/vendor/components/
+cp -r src/alloy-components/ your-project/vendor/alloy-components/
 ```
 
 Then import:
@@ -92,11 +92,11 @@ Inspired by Clack. Inline wizard prompts; no alternate screen. Each completed st
 
 ### Install
 
-Copy `src/forge/` and `src/components/` into your project's `vendor/` folder:
+Copy `src/forge/` and `src/alloy-components/` into your project's `vendor/` folder:
 
 ```sh
 cp -r src/forge/ your-project/vendor/forge/
-cp -r src/components/ your-project/vendor/components/
+cp -r src/alloy-components/ your-project/vendor/alloy-components/
 ```
 
 Then import:

@@ -1,6 +1,6 @@
 package alloy
 
-import components "../components"
+import components "../alloy-components"
 import "core:fmt"
 
 Confirm :: struct {

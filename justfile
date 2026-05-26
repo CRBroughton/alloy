@@ -13,7 +13,7 @@ LINKER_FLAGS := "-lm -lpthread -ldl -lrt"
 # Run tests for all packages
 test:
     -odin test src/style/
-    -odin test src/components/
+    -odin test src/alloy-components/
     -odin test src/alloy/
     -odin test src/forge/
 
@@ -23,7 +23,7 @@ test-forge:
 
 # Run component tests only
 test-components:
-    odin test src/components/
+    odin test src/alloy-components/
 
 # Build all examples into build/ (no execution; used in CI)
 build-all:

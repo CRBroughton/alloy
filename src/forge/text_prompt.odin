@@ -4,7 +4,7 @@ import "core:fmt"
 import "core:strings"
 import "core:unicode/utf8"
 import style "../style"
-import components "../components"
+import components "../alloy-components"
 
 TextPromptState :: struct {
 	using state: components.TextInputState,

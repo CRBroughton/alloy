@@ -1,7 +1,7 @@
 package alloy
 
 import style "../style"
-import components "../components"
+import components "../alloy-components"
 import "core:fmt"
 
 // SelectionOption is an alias for the shared SelectOption type.

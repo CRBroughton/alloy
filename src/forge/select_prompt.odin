@@ -2,7 +2,7 @@ package forge
 
 import "core:fmt"
 import style "../style"
-import components "../components"
+import components "../alloy-components"
 
 // SelectOption is re-exported from components for caller convenience.
 SelectOption :: components.SelectOption

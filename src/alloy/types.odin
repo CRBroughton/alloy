@@ -1,7 +1,7 @@
 package alloy
 
 import "core:time"
-import components "../components"
+import components "../alloy-components"
 
 Key    :: components.Key
 KeyMsg :: components.KeyMsg
