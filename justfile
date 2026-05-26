@@ -24,10 +24,20 @@ build-all:
     odin build examples/components/spinner/     -out:build/spinner        -extra-linker-flags:"{{LINKER_FLAGS}}"
     odin build examples/components/confirm/     -out:build/confirm        -extra-linker-flags:"{{LINKER_FLAGS}}"
     odin build examples/components/multiselect/ -out:build/multiselect    -extra-linker-flags:"{{LINKER_FLAGS}}"
+    odin build examples/components/grid/        -out:build/grid            -extra-linker-flags:"{{LINKER_FLAGS}}"
+    odin build examples/components/box/         -out:build/box             -extra-linker-flags:"{{LINKER_FLAGS}}"
 
 # Remove build artifacts
 clean:
     rm -rf build/
+
+# Run box example
+example-box:
+    odin run examples/components/box/ -extra-linker-flags:"{{LINKER_FLAGS}}"
+
+# Run grid example
+example-grid:
+    odin run examples/components/grid/ -extra-linker-flags:"{{LINKER_FLAGS}}"
 
 # Run counter example
 example-counter:
