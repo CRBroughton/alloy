@@ -39,6 +39,10 @@ build-all:
     odin build examples/forge/step/             -out:build/forge-step      -extra-linker-flags:"{{LINKER_FLAGS}}"
     odin build examples/forge/multi-select/    -out:build/forge-multi-select -extra-linker-flags:"{{LINKER_FLAGS}}"
 
+# Record forge multi-select demo gif
+demo-forge-multi-select:
+    vhs demos/forge-multi-select.tape
+
 # Remove build artifacts
 clean:
     rm -rf build/
