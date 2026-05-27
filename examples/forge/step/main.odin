@@ -13,7 +13,14 @@ SetupCtx :: struct {
 }
 
 main :: proc() {
-	name_result := forge.run_text_prompt("Project name?", "my-app")
+	name_result := forge.run_text_prompt(
+		"Project name?",
+		"my-app",
+		proc(v: string) -> string {
+			if len(v) == 0 do return "Project name cannot be empty"
+			return ""
+		},
+	)
 	if name_result.status == .Cancelled do return
 
 	framework_result := forge.run_select_prompt(

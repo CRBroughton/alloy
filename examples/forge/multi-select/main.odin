@@ -14,7 +14,14 @@ SetupCtx :: struct {
 }
 
 main :: proc() {
-	name_result := forge.run_text_prompt("Project name?", "my-app")
+	name_result := forge.run_text_prompt(
+		"Project name?",
+		"my-app",
+		proc(v: string) -> string {
+			if len(v) == 0 do return "Project name cannot be empty"
+			return ""
+		},
+	)
 	if name_result.status == .Cancelled do return
 
 	extras_result := forge.run_multi_select_prompt(
@@ -42,9 +49,13 @@ main :: proc() {
 				description = "Simple and complete testing utilities",
 			},
 		},
+		proc(values: []string) -> string {
+			if len(values) == 0 do return "Select at least one extra"
+			return ""
+		},
 	)
 	if extras_result.status == .Cancelled do return
-	defer delete(extras_result.values)
+	defer forge.step_result_destroy(&extras_result)
 
 	install_result := forge.run_confirm_prompt("Install dependencies?")
 	if install_result.status == .Cancelled do return
