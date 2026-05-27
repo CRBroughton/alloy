@@ -41,6 +41,8 @@ build-all:
 
 # Record forge multi-select demo gif
 demo-forge-multi-select:
+    mkdir -p build
+    odin build examples/forge/multi-select/ -out:build/forge-multi-select -extra-linker-flags:"{{LINKER_FLAGS}}"
     vhs demos/forge-multi-select.tape
 
 # Remove build artifacts

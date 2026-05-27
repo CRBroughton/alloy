@@ -1,14 +1,16 @@
-Output demos/forge-multi-select.gif
+Output demos/forge-multi-select.webm
 
-Set FontSize 14
-Set Width 900
-Set Height 500
-Set Theme "Dracula"
-Set Shell "bash"
+Set FontSize 28
+Set Width 1400
+Set Height 700
+Set Shell "fish"
 Set PlaybackSpeed 1
-
-# Build first
-Exec "just build-all 2>/dev/null; true"
+Set TypingSpeed 100ms
+Hide
+Type "export PS1='$ ' && clear"
+Enter
+Sleep 300ms
+Show
 
 # Run the example
 Type "./build/forge-multi-select"
@@ -17,25 +19,25 @@ Sleep 500ms
 
 # Project name step — type a name and submit
 Type "my-nuxt-app"
-Sleep 300ms
+Sleep 500ms
 Enter
-Sleep 400ms
+Sleep 500ms
 
 # Multi-select step
 # ESLint is pre-checked (default = true)
 # Toggle Prettier on
 Down
 Space
-Sleep 300ms
+Sleep 500ms
 # Skip Husky
 Down
-Sleep 200ms
+Sleep 500ms
 # Toggle Testing Library on
 Down
 Space
-Sleep 300ms
+Sleep 500ms
 Enter
-Sleep 400ms
+Sleep 500ms
 
 # Confirm: Install dependencies? — default Yes
 Enter
