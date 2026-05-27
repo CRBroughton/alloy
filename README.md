@@ -5,6 +5,8 @@ A TUI framework for Odin;
 - **alloy** - full-screen TUI apps using the Elm Architecture (init / update / view)
 - **forge** - inline CLI wizards; step-by-step prompts that stay in the terminal scroll history
 
+> **Early development** alloy and forge are in rapid, early development. APIs will change, features are incomplete, and there are known rough edges. Not recommended for production use yet.
+
 ---
 
 ## alloy
