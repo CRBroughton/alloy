@@ -92,7 +92,7 @@ return m, alloy.sleep(2 * time.Second, MyTimeoutMsg{})
 
 Inspired by Clack. Inline wizard prompts; no alternate screen. Each completed step stays visible in the terminal.
 
-<video src="demos/forge-multi-select.webm" autoplay loop muted playsinline></video>                                               
+<video src="https://github.com/user-attachments/assets/d48c2d37-0894-4de2-94bc-4ea5df07f52b" autoplay loop muted playsinline></video>
 
 ### Install
 
