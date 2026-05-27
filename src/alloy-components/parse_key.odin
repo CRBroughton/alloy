@@ -27,6 +27,9 @@ parse_key :: proc(buf: []byte) -> KeyMsg {
 		}
 		return KeyMsg{key = .Escape}
 
+	case 0x20:
+		return KeyMsg{key = .Space}
+
 	case:
 		if buf[0] >= 32 && buf[0] < 127 || buf[0] >= 0x80 {
 			r, _ := utf8.decode_rune(buf)

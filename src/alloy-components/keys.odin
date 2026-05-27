@@ -19,6 +19,7 @@ Key :: enum {
 	CtrlC,
 	CtrlD,
 	CtrlL,
+	Space,
 }
 
 KeyMsg :: struct {
