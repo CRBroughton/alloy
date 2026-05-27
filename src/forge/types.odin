@@ -14,6 +14,7 @@ StepStatus :: enum {
 
 StepResult :: struct {
 	value:  string,
+	values: []string,
 	status: StepStatus,
 }
 
