@@ -9,7 +9,7 @@ test_ms_options := []SelectionOption {
 }
 
 ms_key :: proc(k: Key) -> Msg {return KeyMsg{key = k}}
-ms_space :: proc() -> Msg {return KeyMsg{key = .Rune, rune = ' '}}
+ms_space :: proc() -> Msg {return KeyMsg{key = .Space}}
 
 @(test)
 test_multiselect_down_moves_cursor :: proc(t: ^testing.T) {

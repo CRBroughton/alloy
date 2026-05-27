@@ -45,8 +45,8 @@ multiselect_update :: proc(s: ^MultiSelect, msg: Msg) -> Msg {
 		s.cursor = 0
 	case .End:
 		s.cursor = len(s.options) - 1
-	case .Rune:
-		if km.rune == ' ' && len(s.options) > 0 {
+	case .Space:
+		if len(s.options) > 0 {
 			s.selected[s.cursor] = !s.selected[s.cursor]
 		}
 	case .Enter:
