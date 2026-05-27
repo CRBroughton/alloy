@@ -1,28 +1,25 @@
 package main
-
-import "core:fmt"
 import forge "../../../src/forge"
+import "core:fmt"
 
-// Demonstrates Step chrome rendering without a real interactive prompt.
-// Shows all four states: active, done, error, cancelled — then wizard_end.
 main :: proc() {
-	active_chrome  := forge.StepChrome{label = "Project name?"}
-	done_chrome    := forge.StepChrome{label = "Framework?"}
-	error_chrome   := forge.StepChrome{label = "Package manager?"}
-	cancel_chrome  := forge.StepChrome{label = "Install dependencies?"}
+	name_result := forge.run_text_prompt("Project name?", "my-app")
+	if name_result.status == .Cancelled do return
 
-	// Active step — shown while user is typing
-	fmt.print(forge.step_wrap_active(active_chrome, "my-app"))
+	framework_result := forge.run_select_prompt(
+		"Framework?",
+		[]forge.SelectOption {
+			{label = "React", value = "react"},
+			{label = "Vue", value = "vue"},
+			{label = "Svelte", value = "svelte"},
+		},
+	)
+	if framework_result.status == .Cancelled do return
 
-	// Done step — locked after user confirms
-	fmt.print(forge.step_wrap_done(done_chrome, "React"))
+	install_result := forge.run_confirm_prompt("Install dependencies?")
+	if install_result.status == .Cancelled do return
 
-	// Error step — shown when validation fails
-	fmt.print(forge.step_wrap_error(error_chrome, "unsupported package manager"))
+	forge.wizard_end()
 
-	// Cancelled step — shown when user presses Escape
-	fmt.print(forge.step_wrap_cancelled(cancel_chrome))
-
-	// Close the wizard sequence
-	fmt.print(forge.wizard_end())
+	fmt.printf("Creating %s with %s...\n", name_result.value, framework_result.value)
 }

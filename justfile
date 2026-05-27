@@ -44,7 +44,9 @@ clean:
 
 # Run forge step example
 example-forge-step:
-    odin run examples/forge/step/ -extra-linker-flags:"{{LINKER_FLAGS}}"
+    mkdir -p build
+    odin build examples/forge/step/ -out:build/forge-step -extra-linker-flags:"{{LINKER_FLAGS}}"
+    ./build/forge-step
 
 # Run box example
 example-box:
