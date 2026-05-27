@@ -142,14 +142,67 @@ main :: proc() {
 - **run_text_prompt**: single-line text input with optional placeholder; supports `mask = true` for passwords
 - **run_select_prompt**: arrow-key navigable option list; returns the selected value
 - **run_confirm_prompt**: Yes/No toggle with Left/Right arrows and `y`/`n` shortcuts
+- **run_multi_select_prompt**: checkbox list; Space to toggle, Enter to confirm; supports `default` and `description` per option
 
 Each prompt returns a `StepResult`:
 
 ```odin
 StepResult :: struct {
-    value:  string,
+    value:  string,    // display string (single value, or comma-joined for multi-select)
+    values: []string,  // selected values (multi-select only; caller owns — call delete())
     status: StepStatus, // .Done, .Cancelled, .Error
 }
+```
+
+### Multi-select options
+
+`MultiSelectOption` extends `SelectOption` with per-option defaults and descriptions:
+
+```odin
+extras := forge.run_multi_select_prompt("Extras?", []forge.MultiSelectOption{
+    {label = "ESLint",   value = "eslint",   description = "Fast linting",    default = true},
+    {label = "Prettier", value = "prettier", description = "Code formatter"},
+    {label = "Husky",    value = "husky",    description = "Git hooks"},
+})
+if extras.status == .Cancelled do return
+defer delete(extras.values)
+
+for v in extras.values {
+    fmt.printf("  installing %s\n", v)
+}
+```
+
+### Task runner
+
+Run sequential tasks with a live spinner after your prompts:
+
+```odin
+SetupCtx :: struct { name: string }
+ctx := SetupCtx{name = name.value}
+
+result := forge.run_task_step(
+    label         = "Setting up project",
+    ctx           = &ctx,
+    stop_on_error = true,
+    tasks         = []forge.Task(SetupCtx){
+        {
+            label = "Create directory",
+            run   = proc(c: ^SetupCtx) -> bool {
+                return os.make_directory(c.name) == nil
+            },
+        },
+        {
+            label = "Init git repository",
+            run   = proc(c: ^SetupCtx) -> bool {
+                res := forge.exec({"git", "init", c.name})
+                return res.exit_code == 0
+            },
+        },
+    },
+)
+if result.status == .Error do return
+
+forge.wizard_end()
 ```
 
 ---
