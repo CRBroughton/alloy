@@ -14,8 +14,14 @@ import posix "core:sys/posix"
 //   https://github.com/torvalds/linux/blob/master/include/uapi/asm-generic/ioctls.h
 //
 // Darwin (macOS): 0x40087468
-//   Source: sys/ttycom.h in the XNU kernel (_IOC(IOC_OUT, 't', 104, sizeof(winsize)))
+//   Source: sys/ttycom.h in the XNU kernel
 //   https://github.com/apple-oss-distributions/xnu/blob/main/bsd/sys/ttycom.h
+//   Defined as _IOC(IOC_OUT, 't', 104, sizeof(winsize)), which expands to:
+//     IOC_OUT              = 0x40000000  (direction: out)
+//     sizeof(winsize)      = 8           (4 × u16) → 0x00080000 after shift
+//     't'                  = 0x74        → 0x00007400 after shift
+//     104 (nr)             = 0x68
+//     OR'd together        = 0x40087468
 when ODIN_OS == .Linux {
 	TIOCGWINSZ :: c.ulong(0x5413)
 	foreign import libc "system:c"
