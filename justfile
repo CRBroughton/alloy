@@ -8,7 +8,7 @@ default:
 develop:
     nix develop github:crbroughton/nix-flakes?dir=odin
 
-LINKER_FLAGS := "-lm -lpthread -ldl -lrt"
+LINKER_FLAGS := if os() == "macos" { "-lm -lpthread" } else { "-lm -lpthread -ldl -lrt" }
 
 # Run tests for all packages
 test:

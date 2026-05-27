@@ -14,7 +14,9 @@
   */
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    # TODO: revert to "github:nixos/nixpkgs/nixos-unstable" once
+    # https://github.com/NixOS/nixpkgs/pull/523142 is merged (fixes LLVM 18 compiler-rt on Darwin).
+    nixpkgs.url = "github:samestep/nixpkgs/darwin-fix-llvmPackages_18.compiler-rt";
     flake-utils.url = "github:numtide/flake-utils";
   };
 

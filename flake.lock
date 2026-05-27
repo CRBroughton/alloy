@@ -20,16 +20,16 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1779508470,
-        "narHash": "sha256-Ap9KJX+5xHIn3bPIpfNgT6MEXdAECECwo4/rmlQD74M=",
-        "owner": "nixos",
+        "lastModified": 1779482683,
+        "narHash": "sha256-nr7uh0ZT+rLdg3XQidiP550p1pQF9XkQmEmj8mg2njE=",
+        "owner": "samestep",
         "repo": "nixpkgs",
-        "rev": "29916453413845e54a65b8a1cf996842300cd299",
+        "rev": "db55912538f5f8d3d200ddfb9dab84fbb32326fb",
         "type": "github"
       },
       "original": {
-        "owner": "nixos",
-        "ref": "nixos-unstable",
+        "owner": "samestep",
+        "ref": "darwin-fix-llvmPackages_18.compiler-rt",
         "repo": "nixpkgs",
         "type": "github"
       }

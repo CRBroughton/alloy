@@ -1,16 +1,27 @@
 package alloy
 
+import "core:c"
 import "core:fmt"
 import "core:os"
-import linux "core:sys/linux"
 import posix "core:sys/posix"
 
+// TIOCGWINSZ ioctl request code for "get window size".
+// Linux and Darwin use different values.
+when ODIN_OS == .Linux {
+	TIOCGWINSZ :: c.ulong(0x5413)
+	foreign import libc "system:c"
+} else when ODIN_OS == .Darwin {
+	TIOCGWINSZ :: c.ulong(0x40087468)
+	foreign import libc "system:System.framework"
+}
 
-// TIOCGWINSZ is not exposed by Odin's core:sys/linux yet, define it manually.
-// Value is the Linux x86_64 ioctl request code for "get window size".
-TIOCGWINSZ :: u32(0x5413)
+@(default_calling_convention = "c")
+foreign libc {
+	@(link_name = "ioctl")
+	_ioctl :: proc(fd: c.int, request: c.ulong, arg: rawptr) -> c.int ---
+}
 
-// Winsize mirrors the kernel's struct winsize used by TIOCGWINSZ.
+// Winsize mirrors the kernel's struct winsize returned by TIOCGWINSZ.
 Winsize :: struct {
 	ws_row:    u16,
 	ws_col:    u16,
@@ -71,7 +82,7 @@ term_restore :: proc(t: ^Term) {
 // term_size returns the current terminal width and height in columns/rows.
 term_size :: proc() -> (width: int, height: int) {
 	ws: Winsize
-	linux.ioctl(linux.Fd(0), TIOCGWINSZ, uintptr(&ws))
+	_ioctl(0, TIOCGWINSZ, &ws)
 	return int(ws.ws_col), int(ws.ws_row)
 }
 
