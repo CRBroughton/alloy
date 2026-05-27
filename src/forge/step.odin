@@ -84,6 +84,7 @@ wizard_end_view :: proc() -> string {
 
 // wizard_end prints the closing ◇ line, exits the alternate screen, and
 // prints all accumulated locked step output to the main screen.
+// Cleans up internal state so the wizard can be re-entered if needed.
 wizard_end :: proc() {
 	end_view := wizard_end_view()
 	fmt.printf("%s", end_view)
@@ -91,4 +92,6 @@ wizard_end :: proc() {
 	// Exit alt screen → main screen restored; then print wizard summary inline.
 	fmt.printf("\x1b[?1049l\x1b[?25h")
 	fmt.printf("%s", strings.to_string(_forge_locked))
+	strings.builder_destroy(&_forge_locked)
+	_forge_started = false
 }

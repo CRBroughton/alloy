@@ -14,8 +14,16 @@ StepStatus :: enum {
 
 StepResult :: struct {
 	value:  string,
-	values: []string,
+	values: []string, // multi-select only; caller owns — use step_result_destroy
 	status: StepStatus,
+}
+
+// step_result_destroy frees values if non-nil. Safe to call on any StepResult.
+step_result_destroy :: proc(result: ^StepResult) {
+	if result.values != nil {
+		delete(result.values)
+		result.values = nil
+	}
 }
 
 Msg :: union {

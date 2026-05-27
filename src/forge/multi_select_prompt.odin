@@ -11,12 +11,15 @@ MultiSelectOption :: components.MultiSelectOption
 MultiSelectPromptState :: struct {
 	using state: components.MultiSelectState,
 	label:       string,
+	error:       string,
+	validate:    proc([]string) -> string,
 }
 
-multi_select_prompt_init :: proc(label: string, options: []MultiSelectOption) -> MultiSelectPromptState {
+multi_select_prompt_init :: proc(label: string, options: []MultiSelectOption, validate: proc([]string) -> string = nil) -> MultiSelectPromptState {
 	return MultiSelectPromptState{
-		state = components.multi_select_init(options),
-		label = label,
+		state    = components.multi_select_init(options),
+		label    = label,
+		validate = validate,
 	}
 }
 
@@ -32,9 +35,20 @@ multi_select_prompt_update :: proc(state: ^MultiSelectPromptState, msg: Msg) -> 
 		return StepResult{status = .Cancelled}, true
 	}
 
+	// Clear any previous validation error on navigation or toggle.
+	if km.key != .Enter do state.error = ""
+
 	submitted := components.multi_select_update(&state.state, km)
 	if submitted {
 		values := components.multi_select_selected(state.state)
+		if state.validate != nil {
+			err := state.validate(values)
+			if err != "" {
+				delete(values)
+				state.error = err
+				return {}, false
+			}
+		}
 		labels := make([]string, len(values))
 		for v, i in values {
 			for opt in state.options {
@@ -80,14 +94,20 @@ multi_select_prompt_view :: proc(state: MultiSelectPromptState) -> string {
 		}
 		for b in transmute([]byte)line {append(&buf, b)}
 	}
-	return fmt.tprintf("%s", string(buf[:]))
+	view := fmt.tprintf("%s", string(buf[:]))
+	if state.error != "" {
+		return fmt.tprintf("%s%s%s%s", view, style.RED, state.error, style.RESET)
+	}
+	return view
 }
 
 // run_multi_select_prompt runs a complete multi-select step and returns the result.
 // result.values holds the selected option values; result.value is the comma-joined labels.
-// Options with default = true are pre-checked. Caller owns result.values — call delete() when done.
-run_multi_select_prompt :: proc(label: string, options: []MultiSelectOption) -> StepResult {
-	state := multi_select_prompt_init(label, options)
+// Options with default = true are pre-checked.
+// Caller owns result.values — use step_result_destroy to free.
+// validate is called on Enter; return a non-empty string to reject and show the error.
+run_multi_select_prompt :: proc(label: string, options: []MultiSelectOption, validate: proc([]string) -> string = nil) -> StepResult {
+	state := multi_select_prompt_init(label, options, validate)
 	defer multi_select_prompt_destroy(&state)
 
 	return run_step(
