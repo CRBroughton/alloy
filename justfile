@@ -37,10 +37,17 @@ build-all:
     odin build examples/components/grid/        -out:build/grid            -extra-linker-flags:"{{LINKER_FLAGS}}"
     odin build examples/components/box/         -out:build/box             -extra-linker-flags:"{{LINKER_FLAGS}}"
     odin build examples/forge/step/             -out:build/forge-step      -extra-linker-flags:"{{LINKER_FLAGS}}"
+    odin build examples/forge/multi-select/    -out:build/forge-multi-select -extra-linker-flags:"{{LINKER_FLAGS}}"
 
 # Remove build artifacts
 clean:
     rm -rf build/
+
+# Run forge multi-select example
+example-forge-multi-select:
+    mkdir -p build
+    odin build examples/forge/multi-select/ -out:build/forge-multi-select -extra-linker-flags:"{{LINKER_FLAGS}}"
+    ./build/forge-multi-select
 
 # Run forge step example
 example-forge-step:
