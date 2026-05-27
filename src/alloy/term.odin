@@ -5,8 +5,17 @@ import "core:fmt"
 import "core:os"
 import posix "core:sys/posix"
 
-// TIOCGWINSZ ioctl request code for "get window size".
-// Linux and Darwin use different values.
+// TIOCGWINSZ is the ioctl request code for "get window size" (struct winsize).
+// Values are platform-specific ABI constants — do not change without verifying
+// against the kernel headers for that platform.
+//
+// Linux x86-64:  0x5413
+//   Source: include/uapi/asm-generic/ioctls.h in the Linux kernel
+//   https://github.com/torvalds/linux/blob/master/include/uapi/asm-generic/ioctls.h
+//
+// Darwin (macOS): 0x40087468
+//   Source: sys/ttycom.h in the XNU kernel (_IOC(IOC_OUT, 't', 104, sizeof(winsize)))
+//   https://github.com/apple-oss-distributions/xnu/blob/main/bsd/sys/ttycom.h
 when ODIN_OS == .Linux {
 	TIOCGWINSZ :: c.ulong(0x5413)
 	foreign import libc "system:c"
