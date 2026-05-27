@@ -78,7 +78,17 @@ step_wrap_cancelled :: proc(chrome: StepChrome) -> string {
 	)
 }
 
-// wizard_end renders the closing ◇ line that ends a forge wizard.
-wizard_end :: proc() -> string {
+wizard_end_view :: proc() -> string {
 	return fmt.tprintf("%s◇%s\r\n\r\n", style.CYAN, style.RESET)
+}
+
+// wizard_end prints the closing ◇ line, exits the alternate screen, and
+// prints all accumulated locked step output to the main screen.
+wizard_end :: proc() {
+	end_view := wizard_end_view()
+	fmt.printf("%s", end_view)
+	strings.write_string(&_forge_locked, end_view)
+	// Exit alt screen → main screen restored; then print wizard summary inline.
+	fmt.printf("\x1b[?1049l\x1b[?25h")
+	fmt.printf("%s", strings.to_string(_forge_locked))
 }

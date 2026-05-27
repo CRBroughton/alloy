@@ -83,12 +83,12 @@ test_step_wrap_cancelled_text :: proc(t: ^testing.T) {
 
 @(test)
 test_wizard_end_contains_empty_diamond :: proc(t: ^testing.T) {
-	result := wizard_end()
+	result := wizard_end_view()
 	testing.expect(t, strings.contains(result, "◇"), "wizard_end should contain ◇")
 }
 
 @(test)
 test_wizard_end_ends_with_blank_line :: proc(t: ^testing.T) {
-	result := wizard_end()
+	result := wizard_end_view()
 	testing.expect(t, strings.has_suffix(result, "\r\n\r\n"), "wizard_end should end with blank line")
 }

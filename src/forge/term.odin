@@ -1,12 +1,11 @@
 package forge
 
+import components "../alloy-components"
 import "core:fmt"
 import "core:os"
 import posix "core:sys/posix"
-import components "../alloy-components"
 
-// raw_mode_enter puts the terminal into raw mode WITHOUT entering the
-// alternate screen buffer. Completed step output stays in scroll history.
+// raw_mode_enter puts the terminal into raw mode.
 raw_mode_enter :: proc() -> posix.termios {
 	original: posix.termios
 	rc := posix.tcgetattr(posix.STDIN_FILENO, &original)
@@ -20,7 +19,7 @@ raw_mode_enter :: proc() -> posix.termios {
 	raw.c_oflag &~= {.OPOST}
 	raw.c_cflag |= {.CS8}
 	raw.c_lflag &~= {.ECHO, .ICANON, .IEXTEN, .ISIG}
-	raw.c_cc[.VMIN]  = 1
+	raw.c_cc[.VMIN] = 1
 	raw.c_cc[.VTIME] = 0
 
 	posix.tcsetattr(posix.STDIN_FILENO, .TCSANOW, &raw)

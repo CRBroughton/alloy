@@ -64,5 +64,15 @@ run_select_prompt :: proc(label: string, options: []SelectOption) -> StepResult 
 		proc(s: SelectPromptState) -> string {
 			return step_wrap_active(StepChrome{label = s.label}, select_prompt_view(s))
 		},
+		proc(s: SelectPromptState, result: StepResult) -> string {
+			chrome := StepChrome{label = s.label}
+			switch result.status {
+			case .Done:      return step_wrap_done(chrome, result.value)
+			case .Cancelled: return step_wrap_cancelled(chrome)
+			case .Error:     return step_wrap_error(chrome, result.value)
+			case .Active:    unreachable()
+			}
+			return ""
+		},
 	)
 }

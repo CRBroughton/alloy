@@ -55,5 +55,15 @@ run_confirm_prompt :: proc(label: string, default_yes: bool = true) -> StepResul
 		proc(s: ConfirmPromptState) -> string {
 			return step_wrap_active(StepChrome{label = s.label}, confirm_prompt_view(s))
 		},
+		proc(s: ConfirmPromptState, result: StepResult) -> string {
+			chrome := StepChrome{label = s.label}
+			switch result.status {
+			case .Done:      return step_wrap_done(chrome, result.value)
+			case .Cancelled: return step_wrap_cancelled(chrome)
+			case .Error:     return step_wrap_error(chrome, result.value)
+			case .Active:    unreachable()
+			}
+			return ""
+		},
 	)
 }
