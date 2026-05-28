@@ -1,9 +1,11 @@
 package alloy
 
+import "base:intrinsics"
 import "core:os"
 import "core:sync"
 import "core:thread"
 import "core:time"
+import posix "core:sys/posix"
 
 // MsgQueue is a thread-safe FIFO of Msgs.
 MsgQueue :: struct {
@@ -48,6 +50,19 @@ input_thread_proc :: proc(t: ^thread.Thread) {
 		msg := read_key()
 		queue_push(data.queue, msg)
 	}
+}
+
+// _sigwinch_pending is set to 1 by the SIGWINCH signal handler.
+// The event loop checks this flag when idle and pushes a WindowSizeMsg.
+// i32 is used for atomic operations.
+@(private)
+_sigwinch_pending: i32 = 0
+
+// _sigwinch_handler is installed as the SIGWINCH signal handler.
+// Only sets the flag — async-signal-safe.
+@(private)
+_sigwinch_handler :: proc "c" (sig: posix.Signal) {
+	intrinsics.atomic_store(&_sigwinch_pending, i32(1))
 }
 
 // --- Cmd dispatch -----------------------------------------------------------
@@ -133,12 +148,21 @@ run :: proc(p: ^Program($Model)) {
 	defer os.write_string(os.stdout, ALT_SCREEN_EXIT)
 	defer os.write_string(os.stdout, CURSOR_SHOW)
 
-	// 2. Message queue
+	// 2. Install SIGWINCH handler — sets _sigwinch_pending flag on terminal resize.
+	// The event loop checks this flag each idle tick and pushes a WindowSizeMsg.
+	{
+		sa: posix.sigaction_t
+		sa.sa_handler = _sigwinch_handler
+		posix.sigemptyset(&sa.sa_mask)
+		posix.sigaction(posix.Signal(posix.SIGWINCH), &sa, nil)
+	}
+
+	// 3. Message queue
 	queue: MsgQueue
 	queue.msgs = make([dynamic]Msg)
 	defer queue_destroy(&queue)
 
-	// 3. Cmd thread tracker
+	// 4. Cmd thread tracker
 	cmd_threads := make([dynamic]^thread.Thread)
 	defer {
 		for t in cmd_threads {
@@ -148,7 +172,7 @@ run :: proc(p: ^Program($Model)) {
 		delete(cmd_threads)
 	}
 
-	// 4. Input thread
+	// 5. Input thread
 	running := true
 	thread_data := InputThreadData {
 		queue   = &queue,
@@ -163,23 +187,29 @@ run :: proc(p: ^Program($Model)) {
 		thread.destroy(input_t)
 	}
 
-	// 5. Init model — dispatch any startup command (e.g. spinner first tick)
+	// 6. Init model — dispatch any startup command (e.g. spinner first tick)
 	model, first_cmd := p.init()
 	if first_cmd != nil {
 		dispatch_cmd(&queue, first_cmd, &cmd_threads)
 	}
 
-	// 6. First render
+	// 7. First render
 	os.write_string(os.stdout, CURSOR_HIDE)
 	render(p, model)
 
-	// 7. Window size
+	// 8. Initial window size — components initialise to correct size without a manual resize
 	w, h := term_size()
 	queue_push(&queue, WindowSizeMsg{width = w, height = h})
 
-	// 8. Event loop
+	// 9. Event loop
 	for {
 		cleanup_threads(&cmd_threads)
+
+		// Check for terminal resize between messages
+		if intrinsics.atomic_exchange(&_sigwinch_pending, i32(0)) != 0 {
+			rw, rh := term_size()
+			queue_push(&queue, WindowSizeMsg{width = rw, height = rh})
+		}
 
 		msg, ok := queue_pop(&queue)
 		if !ok {
