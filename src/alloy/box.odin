@@ -65,39 +65,6 @@ box_chars := [BoxStyle]BoxChars {
 	},
 }
 
-// visible_len returns the number of visible (non-ANSI-escape) characters in s.
-// Moved to src/style/ in ch20 — defined here until then.
-visible_len :: proc(s: string) -> int {
-	count := 0
-	in_escape := false
-	for index := 0; index < len(s); {
-		ch := rune(s[index])
-		if ch == '\x1b' {
-			in_escape = true
-			index += 1
-			continue
-		}
-		if in_escape {
-			if s[index] == 'm' do in_escape = false
-			index += 1
-			continue
-		}
-		count += 1
-		index += 1
-	}
-	return count
-}
-
-// pad_right_visible pads s to width visible characters with trailing spaces.
-// Handles ANSI escape codes correctly — styled strings align without bias.
-// Moved to src/style/ in ch20 — defined here until then.
-pad_right_visible :: proc(s: string, width: int) -> string {
-	current_width := visible_len(s)
-	if current_width >= width do return s
-	padding := strings.repeat(" ", width - current_width)
-	defer delete(padding)
-	return fmt.tprintf("%s%s", s, padding)
-}
 
 Box :: struct {
 	title:   string,

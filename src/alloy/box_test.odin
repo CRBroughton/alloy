@@ -4,49 +4,6 @@ import "core:testing"
 import "core:strings"
 
 @(test)
-test_visible_len_plain_string :: proc(t: ^testing.T) {
-	testing.expect_value(t, visible_len("hello"), 5)
-}
-
-@(test)
-test_visible_len_empty_string :: proc(t: ^testing.T) {
-	testing.expect_value(t, visible_len(""), 0)
-}
-
-@(test)
-test_visible_len_strips_ansi :: proc(t: ^testing.T) {
-	// "\x1b[36m" (cyan) + "hi" + "\x1b[0m" (reset) — visible length is 2
-	styled := "\x1b[36mhi\x1b[0m"
-	testing.expect_value(t, visible_len(styled), 2)
-}
-
-@(test)
-test_pad_right_visible_short_string :: proc(t: ^testing.T) {
-	result := pad_right_visible("hi", 5)
-	testing.expect_value(t, visible_len(result), 5)
-}
-
-@(test)
-test_pad_right_visible_exact_width :: proc(t: ^testing.T) {
-	result := pad_right_visible("hello", 5)
-	testing.expect_value(t, result, "hello")
-}
-
-@(test)
-test_pad_right_visible_already_wider :: proc(t: ^testing.T) {
-	result := pad_right_visible("toolong", 3)
-	testing.expect_value(t, result, "toolong")
-}
-
-@(test)
-test_pad_right_visible_styled_string :: proc(t: ^testing.T) {
-	// Styled "hi" (visible width 2) padded to 5 — result should have visible width 5
-	styled := "\x1b[36mhi\x1b[0m"
-	result := pad_right_visible(styled, 5)
-	testing.expect_value(t, visible_len(result), 5)
-}
-
-@(test)
 test_box_init_defaults :: proc(t: ^testing.T) {
 	box: Box
 	box_init(&box, 20)
