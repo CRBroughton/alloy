@@ -9,6 +9,7 @@
     "tui",
     "examples",
     "docs",
-    "CICD"
+    "CICD",
+    "forge"
   ]
 }
