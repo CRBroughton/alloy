@@ -21,6 +21,7 @@ main :: proc() {
 
 	tasks := []forge.Task(SetupCtx){{label = "Create Directory", run = proc(c: ^SetupCtx) -> bool {
 				result := forge.exec({"pnpm", "init"})
+				defer forge.exec_result_destroy(&result)
 				return result.success
 			}}}
 
